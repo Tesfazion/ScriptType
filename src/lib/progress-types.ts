@@ -13,4 +13,11 @@ export type ProgressView = {
   averageMemoryScore: number | null;
   completedVerseIds: string[];
   sessions: PracticeSession[];
+  completedKeyboardStageIds?: string[];
+  bestWpm?: number;
+  wordsTyped?: number;
+  perfectLessons?: number;
+  pendingSyncCount: number;
+  achievementIds: string[];
+  cacheWarning?: string;
 };

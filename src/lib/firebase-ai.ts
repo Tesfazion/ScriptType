@@ -3,7 +3,11 @@ import {
   getGenerativeModel,
   GoogleAIBackend,
 } from "firebase/ai";
-import { firebaseApp, firebaseConfigured } from "@/lib/firebase";
+import {
+  firebaseApp,
+  firebaseAppCheck,
+  firebaseConfigured,
+} from "@/lib/firebase";
 
 export type ReflectionPrompt = {
   reference: string;
@@ -19,6 +23,13 @@ export async function generateFirebaseReflection({
   if (!firebaseConfigured || !firebaseApp) {
     throw new Error(
       "AI reflection is unavailable until Firebase is configured. Your private reflection has not been sent.",
+    );
+  }
+  if (!firebaseAppCheck) {
+    throw new Error(
+      process.env.NODE_ENV === "development"
+        ? "Firebase App Check is not initialized. For local AI reflection, disable emulator mode and register the debug token printed in the browser console."
+        : "Firebase AI reflection requires App Check. Configure a reCAPTCHA Enterprise provider for this Web App.",
     );
   }
 

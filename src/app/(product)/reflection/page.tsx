@@ -95,18 +95,18 @@ export default function ReflectionPage() {
     <div className="mx-auto max-w-[880px] float-in">
       <div className="mb-7">
         <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">Private reflection</div>
-        <h1 className="mt-2 text-3xl font-semibold tracking-[-0.06em]">Take one honest moment.</h1>
+        <h1 className="page-title mt-2">Take one honest moment.</h1>
         <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
           A journal is for notice and application, not a spiritual performance. These notes stay in this browser in the demo.
         </p>
       </div>
 
-      <div className="flex items-start gap-3 rounded-2xl border border-[#e7d8b8] bg-[#fff9eb] p-4 text-[#694c1c] dark:border-[#56472b] dark:bg-[#30291e] dark:text-[#f2c46f]">
+      <div className="flex items-start gap-3 rounded-card border border-primary/20 bg-accent p-4 text-accent-foreground">
         <LockKeyhole size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
         <p className="text-xs leading-5">Private by default. Demo reflections are stored only on this device and are never sent to analytics or AI.</p>
       </div>
 
-      <form onSubmit={saveEntry} className="mt-5 rounded-[1.7rem] border bg-card p-5 sm:p-7">
+      <form onSubmit={saveEntry} className="surface-card mt-5 p-card sm:p-7">
         <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-primary">
           <Sparkles size={13} aria-hidden="true" /> Psalm 119:105
         </div>
@@ -126,7 +126,7 @@ export default function ReflectionPage() {
               type="checkbox"
               checked={aiConsent}
               onChange={(event) => setAiConsent(event.target.checked)}
-              className="mt-0.5 size-4 accent-[#6041b8]"
+              className="mt-0.5 size-4 accent-primary focus-visible:ring-2 focus-visible:ring-ring"
             />
             <span>
               Ask Firebase AI for a gentle reflection. This sends the verse and

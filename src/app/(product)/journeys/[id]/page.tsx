@@ -2,6 +2,10 @@ import { notFound } from "next/navigation";
 import { JourneyDetail } from "@/components/journey-detail";
 import { journeys } from "@/data/journeys";
 
+export function generateStaticParams() {
+  return journeys.map(({ id }) => ({ id }));
+}
+
 export default async function JourneyDetailPage({
   params,
 }: {

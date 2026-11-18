@@ -11,9 +11,9 @@ export default function AdminPage() {
       <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
         <div>
           <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">Content studio</div>
-          <h1 className="mt-2 text-3xl font-semibold tracking-[-0.06em]">Scripture, thoughtfully published.</h1>
+          <h1 className="page-title mt-2">Scripture, thoughtfully published.</h1>
         </div>
-        <span className="inline-flex items-center gap-2 rounded-full border border-[#e7d8b8] bg-[#fff9eb] px-3 py-1.5 text-[10px] font-semibold text-[#80590f] dark:border-[#56472b] dark:bg-[#30291e] dark:text-[#f2c46f]">
+        <span className="inline-flex min-h-9 items-center gap-2 rounded-full border border-primary/20 bg-accent px-3 text-xs font-semibold text-accent-foreground">
           <ShieldCheck size={12} aria-hidden="true" /> Staff preview
         </span>
       </div>
@@ -25,7 +25,7 @@ export default function AdminPage() {
           { label: "Open safety reports", value: "0", icon: Flag },
           { label: "Admin audit events", value: "Preview", icon: FileClock },
         ].map(({ label, value, icon: Icon }) => (
-          <article key={label} className="rounded-[1.4rem] border bg-card p-5">
+          <article key={label} className="surface-card p-card">
             <Icon size={17} className="text-primary" aria-hidden="true" />
             <div className="mt-5 text-2xl font-semibold">{value}</div>
             <p className="mt-1 text-[10px] text-muted-foreground">{label}</p>
@@ -34,7 +34,7 @@ export default function AdminPage() {
       </section>
 
       <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_0.65fr]">
-        <section className="rounded-[1.7rem] border bg-card p-5 sm:p-7">
+        <section className="surface-card p-card sm:p-7">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold">Publishing queue</h2>
             <button type="button" onClick={() => setMessage("New drafts require a staff-authenticated Firebase admin role.")} className="inline-flex min-h-9 items-center gap-2 rounded-full border px-3 text-[10px] font-semibold hover:bg-muted">
@@ -59,7 +59,7 @@ export default function AdminPage() {
           </div>
         </section>
 
-        <section className="rounded-[1.7rem] border bg-card p-5 sm:p-7">
+        <section className="surface-card p-card sm:p-7">
           <h2 className="text-sm font-semibold">Operations</h2>
           <div className="mt-5 space-y-2">
             {[

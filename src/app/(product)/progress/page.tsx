@@ -15,9 +15,8 @@ import {
 import { useMemo } from "react";
 import { useAuth } from "@/components/app-providers";
 import { AchievementShare } from "@/components/achievement-share";
-import { achievements } from "@/data/journeys";
 import { useProgress } from "@/hooks/use-progress";
-import { getLevelProgress } from "../../../../shared/domain";
+import { getTypingBadgeIds, getTypingLevelProgress, typingBadges } from "../../../../shared/typing-progress";
 
 function TrendChart({ values }: { values: number[] }) {
   if (values.length < 2) {
@@ -79,28 +78,26 @@ function TrendChart({ values }: { values: number[] }) {
 export default function ProgressPage() {
   const { user } = useAuth();
   const { progress, loading, errorMessage } = useProgress();
-  const level = getLevelProgress(progress?.xp ?? 0);
+  const level = getTypingLevelProgress(progress?.xp ?? 0);
   const speedValues = useMemo(
     () => (progress ? [...progress.sessions].reverse().map((session) => session.wpm) : []),
     [progress],
   );
-  const earnedAchievements = new Set<string>();
-  if ((progress?.versesCompleted ?? 0) > 0) earnedAchievements.add("first-verse");
-  if ((progress?.activeStreak ?? 0) >= 7) earnedAchievements.add("seven-day-streak");
-  if ((progress?.versesCompleted ?? 0) >= 100) earnedAchievements.add("hundred-verses");
-  if ((progress?.versesCompleted ?? 0) >= 1000) earnedAchievements.add("thousand-verses");
-  if ((progress?.activeStreak ?? 0) >= 30) earnedAchievements.add("thirty-day-streak");
-  if ((progress?.sessions ?? []).some((session) => session.accuracy === 100)) earnedAchievements.add("perfect-accuracy");
-  if ((progress?.sessions ?? []).some((session) => (session.memoryScore ?? 0) >= 90)) {
-    earnedAchievements.add("memory-champion");
-  }
+  const typingBadgeIds = getTypingBadgeIds({
+    completedLessons: progress?.sessions.filter((session) => session.mode === "keyboard").length ?? 0,
+    completedStageIds: progress?.completedKeyboardStageIds ?? [],
+    streak: progress?.activeStreak ?? 0,
+    bestWpm: progress?.bestWpm ?? progress?.averageWpm ?? 0,
+    perfectLessons: progress?.perfectLessons ?? 0,
+    wordsTyped: progress?.wordsTyped ?? 0,
+  });
 
   return (
     <div className="float-in">
       <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
         <div>
           <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">Your story in progress</div>
-          <h1 className="mt-2 text-3xl font-semibold tracking-[-0.06em] sm:text-4xl">Look how far you&apos;ve come.</h1>
+          <h1 className="page-title mt-2">Look how far you&apos;ve come.</h1>
           <p className="mt-2 text-sm text-muted-foreground">Every practice is a beginning worth counting.</p>
         </div>
         <span className="rounded-full border bg-card px-3 py-1.5 text-[10px] text-muted-foreground">
@@ -112,12 +109,12 @@ export default function ProgressPage() {
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {[
-          { label: "Verses practiced", value: loading ? "—" : (progress?.versesCompleted ?? 0).toLocaleString(), detail: "unique passages", icon: BookOpenText, color: "text-primary bg-primary/10" },
-          { label: "Typing pace", value: loading ? "—" : `${progress?.averageWpm ?? 0}`, detail: "average WPM", icon: Gauge, color: "text-[#28765d] bg-[#e6f3ed] dark:bg-[#1d382f] dark:text-[#7bdab8]" },
-          { label: "Accuracy", value: loading ? "—" : `${progress?.averageAccuracy ?? 0}%`, detail: "across practices", icon: Target, color: "text-[#916b24] bg-[#fbf0d7] dark:bg-[#3b3020] dark:text-[#f2c46f]" },
-          { label: "Active rhythm", value: loading ? "—" : `${progress?.activeStreak ?? 0}`, detail: "consecutive days", icon: Flame, color: "text-[#a2631a] bg-[#fbefdf] dark:bg-[#392a20] dark:text-[#f4bd75]" },
+          { label: "Verses practiced", value: loading ? "—" : (progress?.versesCompleted ?? 0).toLocaleString(), detail: "unique passages", icon: BookOpenText, color: "text-primary bg-accent" },
+          { label: "Typing pace", value: loading ? "—" : `${progress?.averageWpm ?? 0}`, detail: "average WPM", icon: Gauge, color: "text-primary bg-accent" },
+          { label: "Accuracy", value: loading ? "—" : `${progress?.averageAccuracy ?? 0}%`, detail: "across practices", icon: Target, color: "text-primary bg-accent" },
+          { label: "Active rhythm", value: loading ? "—" : `${progress?.activeStreak ?? 0}`, detail: "consecutive days", icon: Flame, color: "text-primary bg-accent" },
         ].map(({ label, value, detail, icon: Icon, color }) => (
-          <article key={label} className="rounded-[1.4rem] border bg-card p-5">
+          <article key={label} className="surface-card p-card">
             <div className={`grid size-9 place-items-center rounded-xl ${color}`}><Icon size={16} aria-hidden="true" /></div>
             <div className="mt-5 text-2xl font-semibold tracking-[-0.045em] tabular-nums">{value}</div>
             <div className="mt-1 text-xs font-semibold">{label}</div>
@@ -127,7 +124,7 @@ export default function ProgressPage() {
       </section>
 
       <div className="mt-5 grid gap-5 xl:grid-cols-[1.35fr_0.75fr]">
-        <section className="rounded-[1.7rem] border bg-card p-5 sm:p-7">
+        <section className="surface-card p-card sm:p-7">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <div className="text-[9px] font-semibold uppercase tracking-[0.17em] text-muted-foreground">Skill, over time</div>
@@ -145,13 +142,13 @@ export default function ProgressPage() {
           </div>
         </section>
 
-        <section className="rounded-[1.7rem] border bg-card p-5 sm:p-7">
+        <section className="surface-card p-card sm:p-7">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-[9px] font-semibold uppercase tracking-[0.17em] text-muted-foreground">Your next milestone</div>
               <h2 className="mt-1 text-lg font-semibold tracking-[-0.04em]">{level.rank}</h2>
             </div>
-            <div className="grid size-10 place-items-center rounded-xl bg-[#fbf0d7] text-[#916b24] dark:bg-[#3b3020] dark:text-[#f2c46f]">
+            <div className="grid size-10 place-items-center rounded-control bg-accent text-primary">
               <Award size={18} aria-hidden="true" />
             </div>
           </div>
@@ -160,11 +157,11 @@ export default function ProgressPage() {
             <span className="text-xs text-muted-foreground">{progress?.xp ?? 0} XP</span>
           </div>
           <div className="mt-4 h-2 overflow-hidden rounded-full bg-muted">
-            <div className="progress-fill h-full rounded-full bg-gradient-to-r from-[#7050c8] to-[#a98ce8]" style={{ width: `${level.progressPercent}%` }} />
+            <div className="progress-fill h-full rounded-full bg-primary" style={{ width: `${level.progressPercent}%` }} />
           </div>
           <div className="mt-2 flex justify-between text-[9px] text-muted-foreground">
-            <span>{level.currentLevelXp} XP</span>
-            <span>{level.level === 100 ? "Mastered" : `${level.nextLevelXp} XP to level ${level.level + 1}`}</span>
+            <span>{level.xpInLevel} XP in level</span>
+            <span>{level.xpNeeded - level.xpInLevel} XP to level {level.level + 1}</span>
           </div>
           <div className="mt-6 flex items-start gap-2 rounded-xl bg-muted/60 p-3 text-[10px] leading-5 text-muted-foreground">
             <Sparkles size={13} className="mt-0.5 shrink-0 text-primary" aria-hidden="true" />
@@ -174,7 +171,7 @@ export default function ProgressPage() {
       </div>
 
       <div className="mt-5 grid gap-5 lg:grid-cols-[0.85fr_1.15fr]">
-        <section className="rounded-[1.7rem] border bg-card p-5 sm:p-7">
+        <section className="surface-card p-card sm:p-7">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-[9px] font-semibold uppercase tracking-[0.17em] text-muted-foreground">This week</div>
@@ -202,7 +199,7 @@ export default function ProgressPage() {
           </p>
         </section>
 
-        <section className="rounded-[1.7rem] border bg-card p-5 sm:p-7">
+        <section className="surface-card p-card sm:p-7">
           <div className="flex items-start justify-between gap-3">
             <div>
               <div className="text-[9px] font-semibold uppercase tracking-[0.17em] text-muted-foreground">Small wins, remembered</div>
@@ -211,13 +208,13 @@ export default function ProgressPage() {
             <Link href="/today" className="inline-flex items-center gap-1 text-[10px] font-semibold text-primary">Keep going <ArrowUpRight size={12} aria-hidden="true" /></Link>
           </div>
           <div className="mt-5 grid gap-2 sm:grid-cols-2">
-            {achievements.map((achievement) => {
-              const unlocked = earnedAchievements.has(achievement.id);
+            {typingBadges.map((achievement) => {
+              const unlocked = typingBadgeIds.includes(achievement.id);
               return (
-                <div key={achievement.id} className={`flex items-center gap-3 rounded-2xl border p-3 ${unlocked ? "border-gold/20 bg-[#fff9eb] dark:bg-[#30291e]" : "bg-muted/40 opacity-65"}`}>
-                  <span className={`relative grid size-12 shrink-0 place-items-center rounded-full border-4 ${unlocked ? "border-[#ead58c] bg-gradient-to-br from-[#fff4cc] to-[#dcc16f] text-[#725219] shadow-[0_8px_20px_rgba(164,119,36,0.16)] dark:border-[#6c5630] dark:from-[#5b4827] dark:to-[#9b7b3d] dark:text-[#fff2b8]" : "border-border bg-muted text-muted-foreground"}`}>
+                <div key={achievement.id} className={`flex items-center gap-3 rounded-card border p-3 ${unlocked ? "border-primary/20 bg-accent" : "bg-muted/40 opacity-65"}`}>
+                  <span className={`relative grid size-12 shrink-0 place-items-center rounded-full border-4 ${unlocked ? "border-primary/30 bg-primary text-primary-foreground shadow-card" : "border-border bg-muted text-muted-foreground"}`}>
                     <Sparkles size={17} aria-hidden="true" />
-                    {unlocked && <span className="absolute -right-1 -top-1 grid size-4 place-items-center rounded-full border-2 border-[#fff9eb] bg-growth text-white dark:border-[#30291e]"><Check size={8} aria-hidden="true" /></span>}
+                    {unlocked && <span className="absolute -right-1 -top-1 grid size-4 place-items-center rounded-full border-2 border-card bg-primary text-primary-foreground"><Check size={8} aria-hidden="true" /></span>}
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-[11px] font-semibold">{achievement.name}</span>
@@ -234,7 +231,7 @@ export default function ProgressPage() {
       </div>
 
       {progress?.sessions.length === 0 && (
-        <div className="mt-5 rounded-[1.5rem] border border-dashed bg-card/60 p-6 text-center">
+        <div className="mt-5 rounded-card border border-dashed bg-card p-6 text-center">
           <p className="text-sm font-semibold">Your story starts with one verse.</p>
           <p className="mt-1 text-xs text-muted-foreground">Finish a practice and this space will begin to reflect your growth.</p>
           <Link href="/practice" className="mt-4 inline-flex min-h-10 items-center gap-2 rounded-full bg-primary px-4 text-xs font-semibold text-primary-foreground">

@@ -50,15 +50,15 @@ export default function SignInPage() {
   }
 
   return (
-    <main className="grid min-h-dvh bg-[#f7f5fa] text-[#221c2d] lg:grid-cols-[1.08fr_0.92fr]">
-      <section className="mission-glow relative hidden overflow-hidden p-12 text-white lg:flex lg:flex-col">
+    <main className="grid min-h-dvh bg-background text-foreground lg:grid-cols-[1.08fr_0.92fr]">
+      <section className="mission-glow relative hidden overflow-hidden p-12 text-mission-foreground lg:flex lg:flex-col">
         <div className="absolute -right-24 top-20 size-80 rounded-full border border-white/10" />
         <Link href="/" className="relative flex items-center gap-3">
           <span className="brand-mark"><BookOpenText size={17} aria-hidden="true" /></span>
           <span className="text-sm font-semibold">ScriptType</span>
         </Link>
         <div className="relative my-auto max-w-[520px]">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#c8b7ed]">Make a little room</p>
+          <p className="eyebrow text-mission-muted">Make a little room</p>
           <blockquote className="reading-type mt-5 text-4xl leading-[1.35] tracking-[-0.03em]">
             “Thy word is a lamp unto my feet, and a light unto my path.”
           </blockquote>
@@ -72,7 +72,7 @@ export default function SignInPage() {
             ))}
           </div>
         </div>
-        <p className="relative text-[10px] text-white/35">Scripture text: KJV · Rights review required before public audio/content launch.</p>
+        <p className="relative text-xs text-mission-muted">Scripture text: KJV · Rights review required before public audio/content launch.</p>
       </section>
 
       <section className="flex min-h-dvh items-center justify-center px-5 py-10 sm:px-10">
@@ -82,11 +82,11 @@ export default function SignInPage() {
             <span className="text-sm font-semibold">ScriptType</span>
           </Link>
           {user ? (
-            <div className="rounded-[1.7rem] border bg-white p-6 text-center">
-              <span className="mx-auto grid size-12 place-items-center rounded-full bg-[#e7f2eb] text-[#207256]"><Check size={20} aria-hidden="true" /></span>
-              <h1 className="mt-5 text-2xl font-semibold tracking-[-0.05em]">You&apos;re signed in.</h1>
-              <p className="mt-2 text-sm text-[#716a7c]">Your next verse is waiting.</p>
-              <Link href="/today" className="mt-6 inline-flex min-h-11 items-center rounded-full bg-[#6041b8] px-5 text-sm font-semibold text-white">
+            <div className="surface-card p-6 text-center">
+              <span className="mx-auto grid size-12 place-items-center rounded-full bg-accent text-accent-foreground"><Check size={20} aria-hidden="true" /></span>
+              <h1 className="page-title mt-5">You&apos;re signed in.</h1>
+              <p className="mt-2 text-sm text-muted-foreground">Your next verse is waiting.</p>
+              <Link href="/today" className="button-primary mt-6">
                 Continue to today
               </Link>
             </div>
@@ -94,63 +94,63 @@ export default function SignInPage() {
             <>
               <div className="flex items-end justify-between gap-4">
                 <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#7055b2]">
+                  <p className="eyebrow text-primary">
                     {mode === "sign-in" ? "Welcome back" : "Begin your account"}
                   </p>
                   <h1 className="mt-2 text-3xl font-semibold tracking-[-0.06em]">
                     {mode === "sign-in" ? "Sign in." : "Create account."}
                   </h1>
                 </div>
-                <button type="button" onClick={() => setMode(mode === "sign-in" ? "create" : "sign-in")} className="mb-1 text-xs font-semibold text-[#6041b8]">
+                <button type="button" onClick={() => setMode(mode === "sign-in" ? "create" : "sign-in")} className="button-quiet mb-1 min-h-10 text-xs text-primary">
                   {mode === "sign-in" ? "Create account" : "Sign in"}
                 </button>
               </div>
 
               {!firebaseConfigured && (
-                <div className="mt-6 flex items-start gap-2.5 rounded-xl border border-[#e7d8b8] bg-[#fff9eb] p-3 text-xs leading-5 text-[#694c1c]">
+                <div className="mt-6 flex items-start gap-2.5 rounded-control border border-primary/20 bg-accent p-3 text-sm leading-5 text-accent-foreground">
                   <LockKeyhole size={15} className="mt-0.5 shrink-0" aria-hidden="true" />
                   Firebase is not configured. Add the NEXT_PUBLIC_FIREBASE_* values to enable account sign-in.
                 </div>
               )}
 
-              <button type="button" onClick={googleSignIn} disabled={!firebaseConfigured || submitting} className="mt-7 inline-flex min-h-12 w-full items-center justify-center gap-2.5 rounded-xl border bg-white text-sm font-semibold transition hover:bg-[#f7f5fa] disabled:cursor-not-allowed disabled:opacity-50">
+              <button type="button" onClick={googleSignIn} disabled={!firebaseConfigured || submitting} className="button-secondary mt-7 w-full disabled:cursor-not-allowed disabled:opacity-50">
                 <CircleUserRound size={17} aria-hidden="true" /> Continue with Google
               </button>
 
-              <div className="my-6 flex items-center gap-3 text-[10px] uppercase tracking-[0.12em] text-[#91899d]">
-                <span className="h-px flex-1 bg-[#e5e0ec]" /> or use email <span className="h-px flex-1 bg-[#e5e0ec]" />
+              <div className="my-6 flex items-center gap-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                <span className="h-px flex-1 bg-border" /> or use email <span className="h-px flex-1 bg-border" />
               </div>
 
               <form onSubmit={submit} className="space-y-4">
                 {mode === "create" && (
                   <label className="block text-xs font-semibold">
                     Name
-                    <input value={name} onChange={(event) => setName(event.target.value)} required minLength={2} autoComplete="name" className="mt-2 h-12 w-full rounded-xl border bg-white px-4 text-sm font-normal outline-none focus:border-[#6041b8] focus:ring-4 focus:ring-[#6041b8]/10" />
+                    <input value={name} onChange={(event) => setName(event.target.value)} required minLength={2} autoComplete="name" className="field-control mt-2 w-full px-4 text-sm font-normal" />
                   </label>
                 )}
                 <label className="block text-xs font-semibold">
                   Email
                   <span className="relative block">
-                    <Mail size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#91899d]" aria-hidden="true" />
-                    <input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required autoComplete="email" className="mt-2 h-12 w-full rounded-xl border bg-white pl-11 pr-4 text-sm font-normal outline-none focus:border-[#6041b8] focus:ring-4 focus:ring-[#6041b8]/10" />
+                    <Mail size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+                    <input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required autoComplete="email" className="field-control mt-2 w-full pl-11 pr-4 text-sm font-normal" />
                   </span>
                 </label>
                 <label className="block text-xs font-semibold">
                   Password
                   <span className="relative block">
-                    <LockKeyhole size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#91899d]" aria-hidden="true" />
-                    <input type={showPassword ? "text" : "password"} value={password} onChange={(event) => setPassword(event.target.value)} required minLength={8} autoComplete={mode === "create" ? "new-password" : "current-password"} className="mt-2 h-12 w-full rounded-xl border bg-white pl-11 pr-12 text-sm font-normal outline-none focus:border-[#6041b8] focus:ring-4 focus:ring-[#6041b8]/10" />
-                    <button type="button" onClick={() => setShowPassword((shown) => !shown)} className="absolute right-3 top-1/2 grid size-8 -translate-y-1/2 place-items-center text-[#91899d]" aria-label={showPassword ? "Hide password" : "Show password"}>
+                    <LockKeyhole size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+                    <input type={showPassword ? "text" : "password"} value={password} onChange={(event) => setPassword(event.target.value)} required minLength={8} autoComplete={mode === "create" ? "new-password" : "current-password"} className="field-control mt-2 w-full pl-11 pr-12 text-sm font-normal" />
+                    <button type="button" onClick={() => setShowPassword((shown) => !shown)} className="absolute right-2 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full text-muted-foreground hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring" aria-label={showPassword ? "Hide password" : "Show password"}>
                       {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                     </button>
                   </span>
                 </label>
-                {message && <p role="alert" className="rounded-xl border border-[#b63d4a]/20 bg-[#fbecee] px-4 py-3 text-xs text-[#9a303b]">{message}</p>}
-                <button type="submit" disabled={!firebaseConfigured || submitting} className="inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-[#6041b8] text-sm font-semibold text-white transition hover:bg-[#52369f] disabled:cursor-not-allowed disabled:opacity-50">
+                {message && <p role="alert" className="rounded-control border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive">{message}</p>}
+                <button type="submit" disabled={!firebaseConfigured || submitting} className="button-primary w-full disabled:cursor-not-allowed disabled:opacity-50">
                   {submitting ? "Please wait…" : mode === "sign-in" ? "Sign in" : "Create account"}
                 </button>
               </form>
-              <p className="mt-5 text-center text-[10px] leading-4 text-[#91899d]">
+              <p className="mt-5 text-center text-xs leading-5 text-muted-foreground">
                 By continuing, you agree to ScriptType&apos;s terms and privacy choices.
               </p>
             </>

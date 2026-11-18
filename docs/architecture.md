@@ -24,14 +24,15 @@ The browser renders presentation and collects input. Firebase Authentication est
 - **Trusted operations:** Firebase Cloud Functions (TypeScript), with App Check, authentication checks, input validation, idempotency, rate limits, and audit events.
 - **Media:** Firebase Storage only for audio for which the organization has confirmed distribution rights. Prefer hosted/licensed providers where required.
 - **Analytics:** consent-aware event interface; production provider chosen at deployment. Do not send verse input, journal text, email, or sensitive identifiers to analytics.
-- **Hosting:** Firebase App Hosting or another Next-compatible managed host. Firebase services remain behind environment-specific configuration.
+- **Hosting:** Firebase Hosting serves the Next.js static export. The App Router pages are pre-rendered; browser Firebase SDK calls handle auth, data, and callable operations. No page requires a Next.js server at request time.
+- **PWA/offline:** Firebase Hosting serves `public/manifest.json` and `public/sw.js`; the worker caches the app shell, selected product routes, and static assets. Offline account sessions live in a bounded localStorage outbox and retry when connectivity returns while the app is open. This is foreground sync, not Background Sync or an IndexedDB-backed offline database.
 
 ## Firestore collections
 
 | Collection | Document / key | Important fields | Access |
 |---|---|---|---|
 | `users/{uid}` | Firebase UID | `displayName`, `photoURL`, `timezone`, `createdAt`, `updatedAt`, `preferences`, `role` | Owner reads/updates allowlisted profile fields; role is server-only |
-| `users/{uid}/progress/summary` | one summary | `xp`, `level`, `activeStreak`, `verseStreak`, `memoryStreak`, `lastQualifiedDate`, `weeklyGoal`, aggregate counts | Owner read; server write |
+| `users/{uid}/progress/summary` | one summary | `xp`, `level`, `activeStreak`, `verseStreak`, `memoryStreak`, `lastQualifiedDate`, `weeklyGoal`, aggregate counts, `completedKeyboardStageIds`, `bestWpm`, `wordsTyped`, `perfectLessons` | Owner read; server write |
 | `users/{uid}/sessions/{sessionId}` | random ID | activity/reference IDs, metrics, `completedAt`, `idempotencyKey`, reward status | Owner read; create/update through function only |
 | `users/{uid}/journeys/{journeyId}` | journey ID | `status`, completed step IDs, `startedAt`, `updatedAt` | Owner read; server write |
 | `users/{uid}/achievements/{achievementId}` | achievement ID | `unlockedAt`, `sourceSessionId` | Owner read; server write |
@@ -43,6 +44,8 @@ The browser renders presentation and collects input. Firebase Authentication est
 | `groups/{groupId}/members/{uid}` | user UID | role, display alias, joinedAt, visibility preferences | member-scoped; function-controlled |
 | `groups/{groupId}/challenges/{challengeId}` | random ID | dates, activity scope, goal, status | Members read; owner/admin publish through function |
 | `groups/{groupId}/reports/{reportId}` | random ID | reporter UID, target, reason, status, timestamps | Reporter and authorized moderators only |
+| `races/{raceId}/results/{uid}` | daily race ID and user UID | alias, server-computed WPM/accuracy, elapsed time, completion timestamp | Race callable only; client reads through callable |
+| `globalRaceResults/{uid}` | Firebase UID | latest race ID, opt-in alias, server-computed WPM/accuracy, `optedIn` | Race callable only; queried by leaderboard callable |
 | `entitlements/{uid}` | UID | provider, product, status, expiration, verifiedAt | Owner limited read; server write |
 | `adminAudit/{eventId}` | random ID | actor UID, action, entity, timestamp, safe change summary | Admin-only read; server write |
 
@@ -63,6 +66,9 @@ All authenticated functions validate Firebase ID tokens; privileged functions al
 | Function | Request | Result / behavior |
 |---|---|---|
 | `completePractice` | session ID, activity ID, mode, typed-input-derived metrics, start/end timestamps, idempotency key | Recomputes/validates metrics against canonical content, applies dedupe, writes session and rewards transactionally, returns earned XP/level/achievements |
+| `updateRaceSettings` | alias, global opt-in | Saves alias and consent; removes public result on opt-out |
+| `submitRaceResult` | daily race ID, typed race passage, client elapsed time, alias | Validates current race passage and membership/opt-in, computes metrics on the server, saves best WPM |
+| `getRaceLeaderboard` | optional current race ID | Returns global opted-in entries or an existing group's results after membership check |
 | `startJourney` | journey ID | Validates published journey, idempotently creates user journey state |
 | `completeJourneyStep` | journey ID, step ID, session ID | Requires eligible completion; advances progress transactionally |
 | `joinGroup` | invite token | Validates expiry/capacity/moderation state; creates membership and audit event |
@@ -73,6 +79,13 @@ All authenticated functions validate Firebase ID tokens; privileged functions al
 | `deleteAccountData` | confirmation token | Verifies caller, starts auditable deletion workflow and revokes sessions |
 
 The client uses a typed repository interface so the demo adapter and Firebase adapter share UI contracts. Demo mode is an explicit, visible preview mode; it is not presented as an authenticated or durable account.
+
+### Offline and competition boundaries
+
+- The local practice outbox stores up to 100 pending sessions in localStorage. It is isolated per Firebase account, uses stable idempotency keys, and grants no provisional account XP. Pending sessions retry in the foreground on app startup/online events; this does not guarantee delivery if browser storage is cleared or evicted.
+- Weekly-goal and sound preferences keep per-setting timestamps in a per-account outbox. Sync compares each setting's timestamp in a Firestore transaction and keeps the newer value; race alias/visibility uses its dedicated callable. Pending settings also require foreground connectivity to sync.
+- The service worker only handles same-origin GET requests and limits navigation caching to app routes; Firebase requests and arbitrary navigation paths are not cached.
+- Race passages and text metrics are checked by trusted functions. Race elapsed time is supplied by the client, so leaderboard timing is best-effort, not cheat-proof. Global ranking is opt-in. The app can display results for an existing group membership, but group invite creation/joining and moderation workflows are not implemented.
 
 ## Security model
 

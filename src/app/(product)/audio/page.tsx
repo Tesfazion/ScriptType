@@ -1,12 +1,10 @@
-import { ChallengeRunner } from "@/components/challenge-runner";
-import { getVerse } from "@/data/verses";
+import { Suspense } from "react";
+import { ChallengeRoute } from "@/components/challenge-route";
 
-export default async function AudioPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ verse?: string }>;
-}) {
-  const { verse } = await searchParams;
-  const initialVerseId = verse && getVerse(verse) ? verse : undefined;
-  return <ChallengeRunner initialMode="audio" initialVerseId={initialVerseId} />;
+export default function AudioPage() {
+  return (
+    <Suspense fallback={<div className="min-h-[28rem]" aria-busy="true" />}>
+      <ChallengeRoute initialMode="audio" />
+    </Suspense>
+  );
 }
