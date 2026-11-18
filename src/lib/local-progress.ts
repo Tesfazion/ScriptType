@@ -5,8 +5,17 @@ import {
   nextActiveStreak,
   type TypingMetrics,
 } from "../../shared/domain";
+import { normalizeCompletedStageIds } from "../../shared/typing-curriculum";
 
-export type PracticeMode = "typing" | "memory" | "audio";
+export type PracticeMode =
+  | "typing"
+  | "memory"
+  | "audio"
+  | "keyboard"
+  | "race"
+  | "speed"
+  | "accuracy"
+  | "challenge";
 
 export type PracticeSession = TypingMetrics & {
   id: string;
@@ -16,6 +25,8 @@ export type PracticeSession = TypingMetrics & {
   activeStreak: number;
   mode: PracticeMode;
   memoryScore?: number;
+  stageId?: string;
+  syncStatus?: "pending" | "blocked" | "device";
 };
 
 export type LocalProgress = {
@@ -28,6 +39,10 @@ export type LocalProgress = {
   sessions: PracticeSession[];
   completedVerseIds: string[];
   updatedAt: string;
+  completedKeyboardStageIds: string[];
+  bestWpm: number;
+  wordsTyped: number;
+  perfectLessons: number;
 };
 
 const STORAGE_KEY = "scripttype.device-progress.v1";
@@ -71,6 +86,10 @@ function emptyProgress(): LocalProgress {
     sessions: [],
     completedVerseIds: [],
     updatedAt: new Date().toISOString(),
+    completedKeyboardStageIds: [],
+    bestWpm: 0,
+    wordsTyped: 0,
+    perfectLessons: 0,
   };
 }
 
@@ -95,7 +114,14 @@ export function readLocalProgress(): LocalProgress {
     );
   }
 
-  return parsed;
+  return {
+    ...parsed,
+    completedKeyboardStageIds: normalizeCompletedStageIds(
+      Array.isArray(parsed.completedKeyboardStageIds)
+        ? parsed.completedKeyboardStageIds
+        : [],
+    ),
+  };
 }
 
 export function saveLocalProgress(progress: LocalProgress): void {
@@ -147,11 +173,13 @@ export function recordLocalSession({
   metrics,
   mode,
   memoryScore,
+  stageId,
 }: {
   verseId: string;
   metrics: TypingMetrics;
   mode: PracticeMode;
   memoryScore?: number;
+  stageId?: string;
 }): PracticeSession {
   const progress = readLocalProgress();
   const now = new Date();
@@ -166,6 +194,7 @@ export function recordLocalSession({
     isPerfect: metrics.accuracy === 100,
     isMemory: mode === "memory" && (memoryScore ?? 0) >= 70,
     streak: activeStreak,
+    isKeyboardLesson: mode === "keyboard",
   });
   const session: PracticeSession = {
     ...metrics,
@@ -175,7 +204,9 @@ export function recordLocalSession({
     xpEarned,
     activeStreak,
     mode,
+    syncStatus: "device",
     ...(memoryScore === undefined ? {} : { memoryScore }),
+    ...(stageId === undefined ? {} : { stageId }),
   };
   const qualifiedDates =
     progress.weekStart === weekStart ? [...progress.qualifiedDates] : [];
@@ -193,6 +224,13 @@ export function recordLocalSession({
       new Set([...progress.completedVerseIds, verseId]),
     ),
     updatedAt: now.toISOString(),
+    completedKeyboardStageIds:
+      stageId && mode === "keyboard" && metrics.accuracy >= 90
+        ? Array.from(new Set([...(progress.completedKeyboardStageIds ?? []), stageId]))
+        : (progress.completedKeyboardStageIds ?? []),
+    bestWpm: Math.max(progress.bestWpm ?? 0, metrics.wpm),
+    wordsTyped: (progress.wordsTyped ?? 0) + Math.max(1, Math.round(metrics.correctCharacters / 5)),
+    perfectLessons: (progress.perfectLessons ?? 0) + (metrics.accuracy === 100 ? 1 : 0),
   });
 
   return session;

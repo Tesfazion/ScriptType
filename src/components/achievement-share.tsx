@@ -51,7 +51,7 @@ export function AchievementShare({
       <button
         type="button"
         onClick={shareAchievement}
-        className="grid size-8 place-items-center rounded-full text-[#7a641f] transition hover:bg-[#eedda9] dark:text-[#f2c46f] dark:hover:bg-[#493a22]"
+        className="grid size-10 place-items-center rounded-full text-primary transition hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring"
         aria-label={`Share ${name} achievement`}
         title={`Share ${name}`}
       >
@@ -60,7 +60,7 @@ export function AchievementShare({
       <button
         type="button"
         onClick={copyAchievement}
-        className="grid size-8 place-items-center rounded-full text-[#7a641f] transition hover:bg-[#eedda9] dark:text-[#f2c46f] dark:hover:bg-[#493a22]"
+        className="grid size-10 place-items-center rounded-full text-primary transition hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring"
         aria-label={`Copy ${name} achievement`}
         title={copied ? "Copied" : "Copy share text"}
       >
@@ -74,7 +74,7 @@ export function AchievementShare({
         href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`${shareText} ${shareUrl}`)}`}
         target="_blank"
         rel="noreferrer"
-        className="grid size-8 place-items-center rounded-full text-[#7a641f] transition hover:bg-[#eedda9] dark:text-[#f2c46f] dark:hover:bg-[#493a22]"
+        className="grid size-10 place-items-center rounded-full text-primary transition hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring"
         aria-label={`Share ${name} on X`}
         title="Share on X"
       >
@@ -84,7 +84,7 @@ export function AchievementShare({
         href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`}
         target="_blank"
         rel="noreferrer"
-        className="grid size-8 place-items-center rounded-full text-[#7a641f] transition hover:bg-[#eedda9] dark:text-[#f2c46f] dark:hover:bg-[#493a22]"
+        className="grid size-10 place-items-center rounded-full text-primary transition hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring"
         aria-label={`Share ${name} on Facebook`}
         title="Share on Facebook"
       >

@@ -19,6 +19,10 @@ flowchart TD
   K --> L[Next journey step or return tomorrow]
 ```
 
+### Keyboard learning loop
+
+`/today` summarizes skill level, XP, WPM, accuracy, streak, current curriculum step, daily goals, and recent learning activity. The primary action continues the current lesson. `/journeys` exposes the 15 sequential keyboard lessons alongside Scripture journeys. `/trainer` provides guided keyboard and finger coaching; a keyboard lesson unlocks its successor only after its accuracy threshold is met. Practice modes include speed and accuracy criteria plus a daily race.
+
 ## Supporting flows
 
 ### Journey
@@ -40,18 +44,20 @@ Authorized staff → create draft → set translation/provenance and ordered ref
 | `/` | Explain and convert | Distinctive hero, sample typing interaction, how-it-works, testimonials/social proof (only verified), plan comparison, CTA |
 | `/sign-in` | Establish identity | Email/password, Google, error recovery, privacy links; guest demo path |
 | `/onboarding` | Personalize habit | Weekly goal, preferred reminder/timezone, optional journey, privacy and consent |
-| `/app` | Start today's action | Today's Bible Mission, resume journey, streak flame, XP/level, weekly goal, recommended challenge |
+| `/today` | Start today's action | Compact typing and Scripture progress, continue lesson, daily goals, weekly rhythm, recent achievements, typing analytics |
 | `/app/challenge/[id]` | Focused practice | Verse/reference, mode controls, typed text, caret/progress, timer/WPM/accuracy, pause/exit |
 | `/app/complete/[sessionId]` | Reflect and reward | Metrics, XP/milestone motion, optional reflection, next-step CTA |
 | `/app/journeys` | Choose a structured path | Journey map/list, progress, duration, translation and next step |
 | `/app/journeys/[id]` | Continue a path | Chapter/verse steps, completion states, resume action |
 | `/app/memory` | Recall and review | Level progression, due reviews, recall history |
 | `/app/audio` | Listen and type | Playback, replay/speed, transcript access, listening/typing score |
-| `/app/progress` | See growth | WPM/accuracy trends, activity calendar, chapters, memory, goals |
-| `/app/community` | Encourage safely | Groups, opt-in challenges, alias-based rankings, reporting controls |
+| `/progress` | See growth | WPM/accuracy trends, activity calendar, chapters, memory, goals |
+| `/community` | Race with consent | Opt-in daily global alias leaderboard or results for an existing invited group |
+| `/trainer` | Learn keyboard mechanics | Guided key/finger/hand placement with a visual keyboard and hand model |
 | `/app/community/groups/[id]` | Coordinate a group | Challenge status, member visibility choices, group rules, moderator/report |
 | `/app/reflection` | Private practice journal | User-controlled prompts, saved entries, export/delete controls |
 | `/app/settings` | Manage account | Profile/timezone, notifications, privacy, accessibility, subscription, export/delete |
+| `/app/profile` | View identity and practice history | Level/rank, XP, WPM, accuracy, streak, recent lessons, account/device state |
 | `/app/admin` | Curate product content | Role-protected drafts, journeys, daily verses, achievement/challenge CRUD, user safety queues, audit view |
 
 ## Mobile-first wireframes
@@ -80,6 +86,8 @@ Authorized staff → create draft → set translation/provenance and ordered ref
 │ Home  Journeys  Progress  You│  thumb-zone navigation
 └──────────────────────────────┘
 ```
+
+The desktop dashboard follows the same hierarchy in a denser two-column layout rather than stretching each metric into a large card. Scripture and typing retain equal prominence.
 
 ### Focused typing challenge
 

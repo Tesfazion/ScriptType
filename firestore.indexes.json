@@ -1,10 +1,11 @@
 {
   "indexes": [
     {
-      "collectionGroup": "sessions",
+      "collectionGroup": "globalRaceResults",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "completedAt", "order": "DESCENDING" }
+        { "fieldPath": "raceId", "order": "ASCENDING" },
+        { "fieldPath": "wpm", "order": "DESCENDING" }
       ]
     }
   ],

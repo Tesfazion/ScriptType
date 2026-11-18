@@ -121,12 +121,19 @@ export function calculateSessionXp({
   isPerfect,
   isMemory,
   streak,
+  isKeyboardLesson = false,
 }: {
   isPerfect: boolean;
   isMemory: boolean;
   streak: number;
+  isKeyboardLesson?: boolean;
 }): number {
-  return 15 + (isPerfect ? 10 : 0) + (isMemory ? 10 : 0) + (streak > 0 && streak % 7 === 0 ? 5 : 0);
+  return (
+    (isKeyboardLesson ? 20 : 15) +
+    (isPerfect ? (isKeyboardLesson ? 30 : 10) : 0) +
+    (isMemory ? 10 : 0) +
+    (streak > 0 && streak % 7 === 0 ? 100 : 0)
+  );
 }
 
 export function dateInTimezone(date: Date, timeZone: string): string {

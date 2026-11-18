@@ -11,21 +11,21 @@ import {
   Flame,
   Heart,
   House,
+  Keyboard,
   Settings2,
   ShieldCheck,
   Sparkles,
+  UserRound,
   UsersRound,
 } from "lucide-react";
-import { signOut } from "firebase/auth";
-import { useState } from "react";
 import { useAuth } from "@/components/app-providers";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { firebaseAuth } from "@/lib/firebase";
+import { PwaInstallButton } from "@/components/pwa-install-button";
 
 const navigation = [
   { href: "/today", label: "Today", icon: House, mobile: true },
   { href: "/journeys", label: "Journeys", icon: Compass, mobile: true },
-  { href: "/practice", label: "Practice", icon: BookOpenText, mobile: false },
+  { href: "/practice", label: "Practice", icon: BookOpenText, mobile: true },
   {
     href: "/progress",
     label: "Growth",
@@ -33,29 +33,24 @@ const navigation = [
     mobile: true,
   },
   { href: "/community", label: "Community", icon: UsersRound, mobile: true },
+  { href: "/profile", label: "You", icon: UserRound, mobile: true },
   { href: "/memory", label: "Memory", icon: Heart, mobile: false },
+  { href: "/trainer", label: "Keyboard trainer", icon: Keyboard, mobile: false },
   { href: "/audio", label: "Listen", icon: AudioLines, mobile: false },
   { href: "/reflection", label: "Reflection", icon: Sparkles, mobile: false },
 ];
 
 export function ProductShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { user, firebaseConfigured } = useAuth();
-  const [authMessage, setAuthMessage] = useState("");
+  const {
+    user,
+    firebaseConfigured,
+    isOnline,
+    offlineSupportReady,
+    offlineSupportError,
+  } = useAuth();
   const isActive = (href: string) =>
     pathname === href || (href !== "/today" && pathname.startsWith(`${href}/`));
-
-  async function handleSignOut() {
-    if (!firebaseAuth) {
-      setAuthMessage("Sign-out is unavailable because Firebase is not configured.");
-      return;
-    }
-    try {
-      await signOut(firebaseAuth);
-    } catch {
-      setAuthMessage("We couldn’t sign you out. Please try again.");
-    }
-  }
 
   return (
     <div className="page-shell">
@@ -66,22 +61,22 @@ export function ProductShell({ children }: { children: React.ReactNode }) {
         Skip to content
       </a>
       <div className="mx-auto flex min-h-dvh max-w-[1480px]">
-        <aside className="sticky top-0 hidden h-dvh w-[252px] shrink-0 flex-col border-r bg-card/60 px-5 py-7 backdrop-blur-xl lg:flex">
+        <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col border-r border-sidebar-border bg-sidebar px-4 py-6 lg:flex">
           <Link href="/today" className="flex items-center gap-3 px-2">
             <span className="brand-mark" aria-hidden="true">
               <BookOpen size={17} strokeWidth={2.2} />
             </span>
             <span>
-              <span className="block text-[15px] font-semibold tracking-[-0.03em]">
+              <span className="block text-base font-semibold tracking-tight">
                 ScriptType
               </span>
               <span className="block text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                Scripture in motion
+                Typing with purpose
               </span>
             </span>
           </Link>
 
-          <div className="mt-10 px-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          <div className="eyebrow mt-8 px-2">
             YOUR PRACTICE
           </div>
           <nav aria-label="Main navigation" className="mt-3 space-y-1">
@@ -90,7 +85,7 @@ export function ProductShell({ children }: { children: React.ReactNode }) {
                 key={href}
                 href={href}
                 aria-current={isActive(href) ? "page" : undefined}
-                className={`group flex min-h-11 items-center gap-3 rounded-xl px-3 text-[13px] font-medium transition ${
+                className={`group flex min-h-11 items-center gap-3 rounded-control px-3 text-sm font-medium transition ${
                   isActive(href)
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -105,23 +100,35 @@ export function ProductShell({ children }: { children: React.ReactNode }) {
             ))}
           </nav>
 
-          <div className="mt-8 rounded-2xl border border-[#d8c9f5] bg-gradient-to-br from-[#f2edfc] to-[#fbf9ff] p-4 dark:border-[#3f3458] dark:from-[#252133] dark:to-[#1b1924]">
-            <div className="flex items-center gap-2 text-xs font-semibold text-[#503393] dark:text-[#cfbaff]">
+          <div className="surface-muted mt-6 p-3">
+            <div className="flex items-center gap-2 text-sm font-semibold text-primary">
               <Flame size={15} aria-hidden="true" />
-              A small rhythm, daily
+              Small steps, daily
             </div>
-            <p className="mt-2 text-xs leading-5 text-muted-foreground">
-              Five focused minutes is a strong place to begin.
+            <p className="mt-1 text-xs leading-5 text-muted-foreground">
+              A few focused minutes build a lasting skill.
             </p>
-            <Link href="/settings" className="mt-3 inline-flex items-center gap-1 text-[10px] font-semibold text-primary">
-              Choose your weekly goal <span aria-hidden="true">→</span>
+            <Link href="/settings" className="mt-2 inline-flex min-h-9 items-center gap-1 text-xs font-semibold text-primary">
+              Set a weekly goal <span aria-hidden="true">→</span>
             </Link>
           </div>
 
           <div className="mt-auto border-t pt-4">
             <Link
+              href="/profile"
+              aria-current={isActive("/profile") ? "page" : undefined}
+              className={`flex min-h-11 items-center gap-3 rounded-control px-3 text-sm font-medium ${
+                isActive("/profile")
+                  ? "bg-primary/10 text-primary"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              }`}
+            >
+              <UserRound size={17} aria-hidden="true" />
+              Profile
+            </Link>
+            <Link
               href="/settings"
-              className={`flex min-h-11 items-center gap-3 rounded-xl px-3 text-[13px] font-medium ${
+              className={`flex min-h-11 items-center gap-3 rounded-control px-3 text-sm font-medium ${
                 isActive("/settings")
                   ? "bg-primary/10 text-primary"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -132,7 +139,7 @@ export function ProductShell({ children }: { children: React.ReactNode }) {
             </Link>
             <Link
               href="/admin"
-              className={`mt-1 flex min-h-11 items-center gap-3 rounded-xl px-3 text-[13px] font-medium ${
+              className={`mt-1 flex min-h-11 items-center gap-3 rounded-control px-3 text-sm font-medium ${
                 isActive("/admin")
                   ? "bg-primary/10 text-primary"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -145,7 +152,7 @@ export function ProductShell({ children }: { children: React.ReactNode }) {
         </aside>
 
         <div className="min-w-0 flex-1">
-          <header className="sticky top-0 z-30 flex h-[68px] items-center justify-between border-b bg-background/80 px-4 backdrop-blur-xl sm:px-7 lg:px-10">
+          <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/90 px-4 backdrop-blur-xl sm:px-7 lg:px-10">
             <Link href="/today" className="flex items-center gap-2.5 lg:hidden">
               <span className="brand-mark size-8">
                 <BookOpen size={16} aria-hidden="true" />
@@ -153,14 +160,14 @@ export function ProductShell({ children }: { children: React.ReactNode }) {
               <span className="text-sm font-semibold tracking-tight">ScriptType</span>
             </Link>
             <div className="hidden text-xs text-muted-foreground lg:block">
-              Let the Word take root.
+              Practice with purpose.
             </div>
             <div className="ml-auto flex items-center gap-2.5">
               <span
-                className={`hidden items-center gap-1.5 rounded-full border px-3 py-1.5 text-[10px] font-medium sm:inline-flex ${
+                className={`hidden min-h-9 items-center gap-2 rounded-full border px-3 text-xs font-medium sm:inline-flex ${
                   user
                     ? "border-growth/25 bg-growth/5 text-growth"
-                    : "border-gold/30 bg-gold/10 text-[#8a5e14] dark:text-[#f2c46f]"
+                    : "border-primary/20 bg-primary/5 text-primary"
                 }`}
               >
                 <span
@@ -172,19 +179,30 @@ export function ProductShell({ children }: { children: React.ReactNode }) {
                     ? "Device preview"
                     : "Device demo"}
               </span>
+              <span
+                className={`hidden min-h-9 items-center gap-2 rounded-full border px-3 text-xs font-medium sm:inline-flex ${
+                  isOnline
+                    ? "border-growth/25 bg-growth/5 text-growth"
+                    : "border-warning/30 bg-warning/10 text-foreground"
+                }`}
+                title={offlineSupportError || undefined}
+              >
+                <span className={`size-1.5 rounded-full ${isOnline ? "bg-growth" : "bg-warning"}`} />
+                {!isOnline ? "Working offline" : offlineSupportReady ? "Offline ready" : "Connecting"}
+              </span>
+              <PwaInstallButton />
               <ThemeToggle />
               {user ? (
-                <button
-                  type="button"
-                  onClick={handleSignOut}
+                <Link
+                  href="/profile"
                   className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary"
-                  aria-label="Sign out"
-                  title="Sign out"
+                  aria-label="Open profile"
+                  title="Profile"
                 >
                   {user.displayName?.slice(0, 1) ??
                     user.email?.slice(0, 1).toUpperCase() ??
                     "S"}
-                </button>
+                </Link>
               ) : (
                 <Link
                   href="/sign-in"
@@ -196,14 +214,9 @@ export function ProductShell({ children }: { children: React.ReactNode }) {
             </div>
           </header>
 
-          {authMessage && (
-            <p role="status" className="px-6 pt-3 text-sm text-destructive">
-              {authMessage}
-            </p>
-          )}
           <main
             id="main-content"
-            className="mx-auto w-full max-w-[1240px] px-4 pb-28 pt-7 sm:px-7 sm:pt-9 lg:px-10 lg:pb-12"
+            className="mx-auto w-full max-w-[1200px] px-page pb-28 pt-5 sm:px-7 sm:pt-7 lg:px-8 lg:pb-10"
           >
             {children}
           </main>
@@ -212,7 +225,7 @@ export function ProductShell({ children }: { children: React.ReactNode }) {
 
       <nav
         aria-label="Mobile navigation"
-        className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t bg-background/95 px-1 pb-[max(env(safe-area-inset-bottom),0.25rem)] pt-2 shadow-[0_-8px_24px_rgba(27,20,45,0.06)] backdrop-blur-xl lg:hidden"
+        className="mobile-navigation fixed inset-x-0 bottom-0 z-40 grid grid-cols-6 px-1 pb-[max(env(safe-area-inset-bottom),0.25rem)] pt-2 lg:hidden"
       >
         {navigation
           .filter((item) => item.mobile)
@@ -221,7 +234,7 @@ export function ProductShell({ children }: { children: React.ReactNode }) {
               key={href}
               href={href}
               aria-current={isActive(href) ? "page" : undefined}
-              className={`flex min-h-12 flex-col items-center justify-center gap-1 text-[9px] font-medium ${
+              className={`flex min-h-12 flex-col items-center justify-center gap-1 text-xs font-medium ${
                 isActive(href) ? "text-primary" : "text-muted-foreground"
               }`}
             >

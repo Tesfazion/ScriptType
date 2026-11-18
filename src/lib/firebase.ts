@@ -1,7 +1,7 @@
 import { getApps, initializeApp } from "firebase/app";
 import {
   initializeAppCheck,
-  ReCaptchaV3Provider,
+  ReCaptchaEnterpriseProvider,
 } from "firebase/app-check";
 import { connectAuthEmulator, getAuth } from "firebase/auth";
 import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
@@ -9,6 +9,10 @@ import {
   connectFunctionsEmulator,
   getFunctions,
 } from "firebase/functions";
+
+declare global {
+  var FIREBASE_APPCHECK_DEBUG_TOKEN: boolean | string | undefined;
+}
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -34,17 +38,30 @@ export const firebaseEmulatorsEnabled =
   typeof window !== "undefined" &&
   process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATORS === "true";
 
+const isDevelopmentAppCheck =
+  process.env.NODE_ENV === "development" &&
+  !firebaseEmulatorsEnabled;
+const appCheckEnterpriseSiteKey =
+  process.env.NEXT_PUBLIC_FIREBASE_APPCHECK_ENTERPRISE_SITE_KEY;
+
 export const firebaseAppCheck =
-  firebaseApp &&
-  typeof window !== "undefined" &&
-  !firebaseEmulatorsEnabled &&
-  process.env.NEXT_PUBLIC_FIREBASE_APPCHECK_SITE_KEY
-    ? initializeAppCheck(firebaseApp, {
-        provider: new ReCaptchaV3Provider(
-          process.env.NEXT_PUBLIC_FIREBASE_APPCHECK_SITE_KEY,
-        ),
-        isTokenAutoRefreshEnabled: true,
-      })
+  firebaseApp && typeof window !== "undefined" && !firebaseEmulatorsEnabled
+    ? (() => {
+        if (isDevelopmentAppCheck) {
+          self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+          return initializeAppCheck(firebaseApp, {
+            provider: new ReCaptchaEnterpriseProvider("debug"),
+            isTokenAutoRefreshEnabled: true,
+          });
+        }
+
+        if (!appCheckEnterpriseSiteKey) return null;
+
+        return initializeAppCheck(firebaseApp, {
+          provider: new ReCaptchaEnterpriseProvider(appCheckEnterpriseSiteKey),
+          isTokenAutoRefreshEnabled: true,
+        });
+      })()
     : null;
 
 export const firebaseAuth =

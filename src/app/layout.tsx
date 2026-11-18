@@ -8,8 +8,21 @@ export const metadata: Metadata = {
     template: "%s · ScriptType",
   },
   description:
-    "Build a daily Scripture habit, strengthen your typing, and keep the words that matter close.",
+    "Learn touch typing step by step, improve your speed, and keep the words that matter close.",
   applicationName: "ScriptType",
+  manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/scripttype-icon-192.png", type: "image/png", sizes: "192x192" },
+      { url: "/scripttype-icon.svg", type: "image/svg+xml", sizes: "any" },
+    ],
+    apple: [{ url: "/scripttype-icon-192.png", type: "image/png", sizes: "192x192" }],
+  },
+  appleWebApp: {
+    capable: true,
+    title: "ScriptType",
+    statusBarStyle: "default",
+  },
 };
 
 export default function RootLayout({

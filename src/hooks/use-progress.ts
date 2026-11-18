@@ -2,13 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/components/app-providers";
-import { readAccountProgress } from "@/lib/account-progress";
+import {
+  readAccountProgress,
+  readCachedAccountProgress,
+} from "@/lib/account-progress";
 import {
   getProgressSummary,
   readLocalProgress,
   type LocalProgress,
 } from "@/lib/local-progress";
 import type { ProgressView } from "@/lib/progress-types";
+import { getPendingPracticeSessions } from "@/lib/progress-service";
 
 type UseProgressResult = {
   progress: ProgressView | null;
@@ -40,6 +44,12 @@ function localProgressView(progress: LocalProgress): ProgressView {
           ),
     completedVerseIds: progress.completedVerseIds,
     sessions: progress.sessions,
+    completedKeyboardStageIds: progress.completedKeyboardStageIds ?? [],
+    bestWpm: progress.bestWpm ?? 0,
+    wordsTyped: progress.wordsTyped ?? 0,
+    perfectLessons: progress.perfectLessons ?? 0,
+    pendingSyncCount: 0,
+    achievementIds: [],
   };
 }
 
@@ -54,35 +64,68 @@ export function useProgress(): UseProgressResult {
     if (authLoading) return;
     let active = true;
 
-    const request = user
-      ? readAccountProgress(user.uid).then((accountProgress) => {
+    async function loadProgress() {
+      setLoading(true);
+      setErrorMessage("");
+      try {
+        if (user) {
+          let accountProgress: ProgressView;
+          try {
+            accountProgress = await readAccountProgress(user.uid);
+          } catch (error) {
+            const cached = window.navigator.onLine
+              ? null
+              : readCachedAccountProgress(user.uid);
+            if (!cached) throw error;
+            accountProgress = {
+              ...cached,
+              cacheWarning: "You are offline. Showing the most recently synced account progress.",
+            };
+          }
+          const pendingSessions = getPendingPracticeSessions(user.uid);
+          const pendingIds = new Set(pendingSessions.map((session) => session.id));
           if (active) {
-            setProgress(accountProgress);
+            setProgress({
+              ...accountProgress,
+              pendingSyncCount: pendingSessions.length,
+              sessions: [
+                ...pendingSessions,
+                ...accountProgress.sessions.filter((session) => !pendingIds.has(session.id)),
+              ],
+            });
             setLocalProgress(null);
+            if (accountProgress.cacheWarning) {
+              setErrorMessage(accountProgress.cacheWarning);
+            }
           }
-        })
-      : Promise.resolve().then(() => {
-          const deviceProgress = readLocalProgress();
-          if (active) {
-            setLocalProgress(deviceProgress);
-            setProgress(localProgressView(deviceProgress));
-          }
-        });
+          return;
+        }
 
-    request
-      .catch((error: unknown) => {
+        const deviceProgress = readLocalProgress();
+        if (active) {
+          setLocalProgress(deviceProgress);
+          setProgress(localProgressView(deviceProgress));
+        }
+      } catch (error: unknown) {
         if (active) {
           setErrorMessage(
             error instanceof Error ? error.message : "Progress could not be loaded.",
           );
         }
-      })
-      .finally(() => {
+      } finally {
         if (active) setLoading(false);
-      });
+      }
+    }
+
+    const refresh = () => void loadProgress();
+    refresh();
+    window.addEventListener("scripttype:progress-updated", refresh);
+    window.addEventListener("online", refresh);
 
     return () => {
       active = false;
+      window.removeEventListener("scripttype:progress-updated", refresh);
+      window.removeEventListener("online", refresh);
     };
   }, [authLoading, user]);
 

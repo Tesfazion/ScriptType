@@ -12,6 +12,7 @@ node_modules/
 
 # testing
 /coverage
+/.tsupgrader/runtime-validation/
 
 # next.js
 /.next/

@@ -22,10 +22,13 @@ export function ThemeToggle() {
       (preference === null &&
         window.matchMedia("(prefers-color-scheme: dark)").matches);
     queueMicrotask(() => setIsDark(dark));
+    document.documentElement.classList.toggle("dark", dark);
     if (preference) {
       document.documentElement.dataset.theme = preference;
     } else if (dark) {
       document.documentElement.dataset.theme = "dark";
+    } else {
+      delete document.documentElement.dataset.theme;
     }
   }, []);
 
@@ -33,6 +36,7 @@ export function ThemeToggle() {
     const next = !isDark;
     const theme = next ? "dark" : "light";
     document.documentElement.dataset.theme = theme;
+    document.documentElement.classList.toggle("dark", next);
     setIsDark(next);
     try {
       window.localStorage.setItem("scripttype.theme", theme);

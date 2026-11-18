@@ -17,10 +17,16 @@ service cloud.firestore {
 
     match /users/{uid} {
       allow read: if isOwner(uid);
-      allow create, update: if isOwner(uid) &&
+      allow create: if isOwner(uid) &&
         !request.resource.data.keys().hasAny([
           "xp", "level", "activeStreak", "verseStreak",
-          "memoryStreak", "entitlements", "role"
+          "memoryStreak", "entitlements", "role", "raceSettings"
+        ]);
+      allow update: if isOwner(uid) &&
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+          "xp", "level", "activeStreak", "verseStreak",
+          "memoryStreak", "entitlements", "role",
+          "raceSettings"
         ]);
       allow delete: if false;
 
@@ -99,6 +105,14 @@ service cloud.firestore {
     match /entitlements/{uid} {
       allow read: if isOwner(uid);
       allow write: if false;
+    }
+
+    match /races/{raceId}/{document=**} {
+      allow read, write: if false;
+    }
+
+    match /globalRaceResults/{uid} {
+      allow read, write: if false;
     }
 
     match /adminAudit/{document=**} {

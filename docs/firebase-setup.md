@@ -12,8 +12,9 @@ the repository.
 |---|---|
 | Authentication | Email/password and Google sign-in |
 | Cloud Firestore | Reads user progress and practice sessions; access is controlled by `firestore.rules` |
-| Cloud Functions | `completePractice` verifies practice and writes session/reward data server-side; requires authentication and App Check |
-| App Check | reCAPTCHA v3 client setup; a site key is required for deployed practice submissions |
+| Cloud Functions | `completePractice` verifies practice and writes session/reward data server-side; `setRaceSettings`, race submission, and leaderboard callables manage opt-in daily race data; requires authentication and App Check |
+| Firebase AI Logic | Client-side Gemini Developer API requests from the private reflection screen, only after explicit consent |
+| App Check | Firebase AI Logic uses a localhost debug token during development and reCAPTCHA Enterprise for production Web requests |
 
 Firebase Storage, Analytics, and push notifications are **not currently wired
 into the app**. Do not treat those services as configured just because Firebase
@@ -27,16 +28,27 @@ is present.
    The Firebase web API key is intended to be used in the browser; it is not an
    Admin credential. Never put a service-account key in a `NEXT_PUBLIC_*`
    variable.
-3. In **Authentication → Sign-in method**, enable **Email/Password** and
+3. In Firebase Console, open **AI Logic**, click **Get started**, choose the **Gemini
+   Developer API** (the code uses `GoogleAIBackend`), and finish the setup for
+   the existing ScriptType Web app. If prompted, select/register that app and
+   complete the setup workflow. Do not stop while the AI Logic app status says
+   **Unregistered**. This workflow enables the required APIs and configures the
+   Firebase AI Logic API for the Firebase web API key.
+4. In **Authentication → Sign-in method**, enable **Email/Password** and
    **Google**. Add the site host (for local development, `localhost`) to
    Authentication's authorized domains.
-4. Create a **Cloud Firestore** database. The current callable function is
+5. Create a **Cloud Firestore** database. The current callable function is
    deployed in `us-central1`; choose a nearby Firestore location before
    creating the database because its location cannot later be changed.
-5. In **App Check**, register the web app with **reCAPTCHA v3**. Add your local
-   and deployed hostnames to the reCAPTCHA key's allowed domains. Copy the
-   reCAPTCHA **site key** (not the secret key). The function enforces App Check,
-   so deployed practice submissions will fail until the site key is configured.
+6. In **Security → App Check → Apps**, register the production Web app with
+   **reCAPTCHA Enterprise**. Use a score-based Web key created for the correct
+   domains; do not add `localhost` to a production key. AI Logic App Check is
+   enforced, and callable practice also requires App Check.
+7. In **Security → App Check → APIs**, check the **Firebase AI Logic**
+   enforcement status. Keep replay protection disabled until the app is
+   explicitly configured to use limited-use tokens.
+8. If the Firebase API key has API restrictions, include
+   `firebasevertexai.googleapis.com` in its allowed APIs.
 
 ## 2. Add local environment settings
 
@@ -50,7 +62,7 @@ NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
 NEXT_PUBLIC_FIREBASE_APP_ID=your-web-app-id
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
 NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.firebasestorage.app
-NEXT_PUBLIC_FIREBASE_APPCHECK_SITE_KEY=your-recaptcha-v3-site-key
+NEXT_PUBLIC_FIREBASE_APPCHECK_ENTERPRISE_SITE_KEY=your-recaptcha-enterprise-site-key
 NEXT_PUBLIC_USE_FIREBASE_EMULATORS=false
 ```
 
@@ -59,6 +71,13 @@ values above are placeholders. The storage bucket and sender ID are currently
 optional for the features connected here. Keep `.env.local` private and
 untracked. Next.js embeds `NEXT_PUBLIC_*` values into browser bundles at build
 time, so set the correct values in each deployment environment before building.
+
+During `npm run dev`, the browser initializes Firebase App Check's debug mode
+automatically (unless the emulator flag is enabled). Open `/reflection`, read
+the debug token printed in the **browser console**, and register that token in
+**Security → App Check → Apps → ScriptType → Manage debug tokens**. Keep the
+token private and out of source control. For production, provide the
+reCAPTCHA Enterprise site key above.
 
 Then start the app:
 
@@ -70,6 +89,19 @@ Open `http://localhost:3646/sign-in`. Create an email/password account or use
 Google sign-in. A successful sign-in uses Firebase Authentication. Completing
 practice while signed in calls `completePractice`; the server writes the
 authoritative session and rewards. Signed-out practice remains device-local.
+
+The app can be installed from supported browsers and caches selected app routes
+for offline navigation. Offline account sessions are held in a bounded
+localStorage queue and retried when the app is open and connectivity returns.
+They do not receive account XP until the server confirms the submission.
+Clearing browser storage can remove pending sessions. This is not a full
+offline Firestore database and does not use Background Sync.
+
+Daily race results are calculated and written by callable functions. Global
+visibility is opt-in and uses the configured alias. Group race access requires
+an existing Firebase group membership; this repository does not yet include
+the group invite creation/join flow. Race elapsed time is measured client-side,
+so results are not cheat-proof.
 
 ## 3. Run Firebase locally with emulators
 
@@ -89,7 +121,6 @@ NEXT_PUBLIC_FIREBASE_PROJECT_ID=demo-scripttype-local
 NEXT_PUBLIC_FIREBASE_APP_ID=local-emulator
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=local-emulator
 NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=demo-scripttype-local.firebasestorage.app
-NEXT_PUBLIC_FIREBASE_APPCHECK_SITE_KEY=
 NEXT_PUBLIC_USE_FIREBASE_EMULATORS=true
 ```
 
@@ -107,7 +138,10 @@ The browser SDK connects Auth to `127.0.0.1:9099`, Firestore to
 `127.0.0.1:8080`, and Functions to `127.0.0.1:5001` when the emulator flag is
 true. The Emulator Suite UI is at `http://127.0.0.1:4000`. Emulator data is
 local and separate from your production Firebase project. Turn the flag off
-before using real Firebase services.
+before using real Firebase services. Firebase AI Logic calls the real Firebase
+backend, not an emulator; to test AI locally, use your real Firebase web
+configuration with emulator mode off and register the local App Check debug
+token.
 
 Build the callable function independently with:
 
@@ -115,35 +149,49 @@ Build the callable function independently with:
 npm run functions:build
 ```
 
-## 4. Deploy Firebase rules, indexes, and functions
+## 4. Deploy Firebase services
 
-Use a staging Firebase project first. Build the function, then deploy the
-Firestore rules, indexes, and Functions:
+The repository is linked to the production Firebase project
+`scripttype-61c15`. For safer testing, replace this project ID with a separate
+staging project in the commands below.
+
+Build and deploy the Firestore rules, indexes, and callable Function:
 
 ```powershell
-npm run functions:build
-firebase deploy --only firestore:rules,firestore:indexes,functions --project YOUR_FIREBASE_PROJECT_ID
+npm run deploy:firebase
 ```
 
-Replace `YOUR_FIREBASE_PROJECT_ID` with the project ID from the Firebase
-console. The function uses Node.js 20 and the `us-central1` region. Deploying
-Cloud Functions requires a Firebase plan that supports Functions and the
-associated Google Cloud billing setup.
+The Function uses Node.js 20 and the `us-central1` region. Deploying Cloud
+Functions requires a Firebase plan that supports Functions and the associated
+Google Cloud billing setup.
 
-Set the same web app config and reCAPTCHA site key in the hosting provider's
-environment settings, then rebuild/redeploy the Next.js site. Firebase web
-config is public configuration, but Admin credentials and other server
-secrets must never be exposed as `NEXT_PUBLIC_*` values.
+## 5. Deploy the web app to Firebase Hosting
 
-## 5. Hosting note
+This app uses Firebase Hosting for a **static Next.js export**, not Firebase
+App Hosting or server-side rendering. All current routes are pre-renderable:
+the journey IDs come from checked-in data, and the optional `?verse=...`
+selection is read in the browser. Authentication, Firestore, Firebase AI, and
+callable Functions are browser-to-Firebase SDK integrations; there are no
+Next.js API routes, server actions, request cookies, or server-only page data.
 
-The `hosting` block in `firebase.json` points to a static `out` directory, but
-this Next.js app is not configured for static export. Do not deploy the site
-with `firebase deploy --only hosting` unless you first deliberately configure
-and verify a compatible static export. Host the Next.js app on a Next.js
-compatible provider (or configure Firebase App Hosting separately); the web
-app can still use Firebase Authentication, Firestore, and Functions regardless
-of where the UI is hosted.
+The Firebase Hosting config serves Next.js's `out` directory and maps its
+`.html` files to clean URLs. There is intentionally no catch-all rewrite to
+`/index.html`, which would incorrectly send every deep link to the landing
+page.
+
+Set the `NEXT_PUBLIC_FIREBASE_*` values in `.env.local` (or the production
+environment used by the build) before deploying. These values are embedded
+into the exported browser bundle at build time. Then run:
+
+```powershell
+npm run deploy:hosting
+```
+
+The script runs `next build` to generate `out` before deploying Hosting to
+`scripttype-61c15`. Enable the Google and Email/Password providers, configure
+Firestore, deploy the rules/indexes/Function, and allowlist the Hosting domain
+in Firebase Authentication and App Check. Do not put Firebase Admin
+credentials or service-account keys in `NEXT_PUBLIC_*` variables.
 
 ## Troubleshooting
 
@@ -152,10 +200,23 @@ of where the UI is hosted.
   root `.env.local`, then restart `npm run dev`.
 - **Google sign-in reports an unauthorized domain:** add the current hostname
   in Firebase Authentication's authorized domains.
+- **AI Logic shows the Web app as Unregistered:** complete **AI Logic → Get
+  started** for the existing Firebase Web app and selected
+  Gemini API provider. A Firebase Web app being `ACTIVE` does not mean the
+  separate Firebase AI Logic onboarding step is complete.
+- **Firebase AI Logic returns 403:** confirm the AI Logic Web app is registered,
+  App Check is enforced for AI Logic, and a valid App Check token is present.
+  For localhost, register the debug token printed in the browser console. For
+  production, register the app with reCAPTCHA Enterprise and set
+  `NEXT_PUBLIC_FIREBASE_APPCHECK_ENTERPRISE_SITE_KEY`.
+- **API key request is denied:** compare all Firebase config fields with the
+  same Web app in Project settings. If the key is API-restricted, allow
+  `firebasevertexai.googleapis.com`. Firebase CLI's `firebase apps:sdkconfig
+  WEB <app-id>` can retrieve the authoritative Web config.
 - **Practice cannot be saved for a signed-in account:** verify App Check is
-  registered with reCAPTCHA v3, the site key matches
-  `NEXT_PUBLIC_FIREBASE_APPCHECK_SITE_KEY`, the hostname is allowed, and the
-  Function is deployed with App Check enabled.
+  registered with reCAPTCHA Enterprise, the site key matches
+  `NEXT_PUBLIC_FIREBASE_APPCHECK_ENTERPRISE_SITE_KEY`, the hostname is allowed,
+  and the Function is deployed with App Check enabled.
 - **Permission denied reading progress:** deploy `firestore.rules` and ensure
   the user is signed in to the same Firebase project configured in the app.
 - **Function not found or unavailable:** deploy Functions to the configured

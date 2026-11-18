@@ -2,33 +2,32 @@
 
 ## Identity
 
-ScriptType should feel like a focused studio for daily growth: warm, quietly confident, and alive through progress. Scripture is given breathing room; the product's color, voice, and activity map make it recognizable without relying on a logo.
+ScriptType is a focused studio for daily growth: calm, confident, and made lively through progress. The authenticated home uses compact skill metrics and an obvious next lesson, while Scripture has equal prominence in its own journey. A restrained indigo accent identifies actions and active progress. The shared implementation lives in `src/app/globals.css`.
 
 ## Color tokens
 
-| Token | Light | Dark | Purpose |
-|---|---|---|---|
-| `canvas` | `#F8F7FC` | `#111019` | App background |
-| `surface` | `#FFFFFF` | `#1B1924` | Cards and input surfaces |
-| `surface-raised` | `#F0EDF7` | `#252231` | Hovered/raised surfaces |
-| `ink` | `#211B2C` | `#F7F4FB` | Primary text |
-| `muted` | `#6D6578` | `#B8B1C2` | Secondary text |
-| `brand` | `#6041B8` | `#B69AFF` | Primary actions and journey path |
-| `brand-deep` | `#392366` | `#D0BCFF` | High-emphasis brand accents |
-| `growth` | `#137A60` | `#62D6AE` | Success and mastery |
-| `gold` | `#A66B0B` | `#F2C46F` | XP and milestone accents |
-| `error` | `#B63D4A` | `#FF8790` | Error status |
-| `border` | `#E5E0EC` | `#373341` | Quiet separation |
+The semantic CSS variables below are the source of truth. Light mode is the default; dark mode is selected with the theme toggle or follows the operating-system preference. Mission surfaces intentionally retain a dark treatment in either theme.
 
-Use semantic tokens rather than raw palette values in components. Check all foreground/background pairs with automated contrast tests, particularly brand buttons and success states. Never rely on purple/green alone to distinguish characters.
+| Token | Purpose |
+|---|---|
+| `--background`, `--foreground` | Page canvas and primary text |
+| `--card`, `--card-foreground` | Raised surfaces and their text |
+| `--muted`, `--muted-foreground` | Secondary surfaces and text |
+| `--primary`, `--primary-foreground` | Primary actions and active progress |
+| `--accent`, `--accent-foreground` | Quiet emphasis and selected states |
+| `--border`, `--input`, `--ring` | Separation, form controls, and focus |
+| `--destructive` | Error and destructive-action feedback |
+| `--mission-*` | Fixed contrast colors for dark Scripture/mission surfaces |
+
+Use semantic Tailwind utilities such as `bg-background`, `text-muted-foreground`, `border-border`, and `ring-ring` rather than component-specific hex values. Verify foreground/background combinations against WCAG AA as screens evolve; status and typing correctness must never be communicated by color alone.
 
 ## Type and layout
 
-- Display: `DM Sans` (or a self-hosted equivalent) for confident product headings.
-- Reading: `Source Serif 4` for Scripture passages and long-form reading.
-- Interface: `DM Sans`; tabular numerals for WPM, time, XP, and progress metrics.
-- Use `next/font` or licensed self-hosted font files; avoid blocking on external font networks.
-- Mobile baseline: 4-column spacing rhythm with 16px page gutters; tablet 24px; wide layouts use max-width reading and practice canvases rather than stretching text.
+- Interface: Inter when installed, with system UI fallbacks; Scripture uses a system serif stack and typing uses a system monospace stack. Avoid font downloads that block or make builds network-dependent.
+- Display and page-title sizes are defined in the Tailwind theme; use the shared `page-title`, `eyebrow`, and `reading-type` classes for repeated roles.
+- Spacing tokens: `--space-page`, `--space-section`, and `--space-card`, exposed as `page`, `section`, and `card` spacing utilities.
+- Radius and elevation tokens: `--radius-control-token`, `--radius-card-token`, `--radius-panel-token`, and the `--shadow-*-token` family. Use the shared `surface-card`, `surface-muted`, and button classes before adding one-off treatments.
+- Mobile baseline: 16px page gutters; tablet 24px; wide layouts use max-width reading and practice canvases rather than stretching text.
 - Scripture text: 1.4-1.6 line height; comfortable measure; clear reference/translation metadata.
 - Touch targets: at least 44×44 CSS px. Keep challenge input and bottom navigation inside mobile thumb reach.
 
@@ -39,8 +38,11 @@ Use semantic tokens rather than raw palette values in components. Check all fore
 - **XP ribbon:** compact level progress with accessible text for current/next level; avoids full-width dashboard bars.
 - **Streak ember:** restrained ember/flame mark paired with a count and supportive copy; no threatening loss state.
 - **Typing canvas:** distinct reading and input surfaces, current character indicator, inline error decoration, and persistent progress/metric strip.
+- **Keyboard coach:** full key layout, highlighted target and finger zone, and paired hand diagrams that identify home-row placement.
+- **Learning dashboard:** compact level/XP/WPM/accuracy/streak summary, continue-lesson action, daily goals, recent achievements, weekly activity, and typing analytics.
+- **Race track:** clear relative-progress lanes for the learner and daily race comparators; server-checked score details remain distinct from client-measured elapsed time.
 - **Achievement reveal:** small, celebratory earned-state transition; the content remains visible with motion disabled.
-- **Buttons:** primary filled brand, secondary outlined/tonal, tertiary text; visible focus, disabled, busy, and error states.
+- **Buttons:** use `button-primary`, `button-secondary`, `button-quiet`, or `button-mission`; visible focus, disabled, busy, and error states.
 - **Forms:** persistent labels, actionable inline validation, autocomplete hints, and accessible error summaries.
 - **Navigation:** mobile bottom bar for Today/Journeys/Progress/Community/Profile; desktop rail with active journey marker.
 

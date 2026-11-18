@@ -2,7 +2,7 @@
 
 ## Product promise
 
-**Improve your typing speed while memorizing Scripture.** ScriptType turns a meaningful daily encounter with the Bible into a short, repeatable practice loop: read or recall a verse, type it with intention, reflect if desired, and see growth over time.
+**Improve your typing speed through a guided curriculum while retaining meaningful Scripture practice.** ScriptType combines a 15-lesson keyboard-learning journey with Scripture memorization, reflection, and measurable growth.
 
 ## Problem and opportunity
 
@@ -55,6 +55,12 @@ Bible reading, memorization, and typing practice are usually separate activities
 - **REQ-PRACTICE-04:** WPM is based on correctly typed characters / 5 / elapsed minutes; accuracy is correct keystrokes divided by attempted keystrokes. Pauses shorter than one second remain included; attempts under five seconds are excluded from a WPM result.
 - **REQ-PRACTICE-05:** A session is submitted once with an idempotency key. Trusted server logic revalidates the verse, elapsed time, and reward eligibility before writing progression.
 - **REQ-PRACTICE-06:** Focus, selection, paste behavior, retry, and mobile input are designed and tested explicitly. The user's text is never silently discarded.
+- **REQ-PRACTICE-07:** The first 15 keyboard lessons are ordered and unlock sequentially; coached lessons identify the target key, hand, and finger.
+- **REQ-PRACTICE-08:** Speed and accuracy practice state their completion criteria before practice; account rewards remain server-authoritative.
+- **REQ-PWA-01:** Installable browsers can install the web app; core routes and bundled lesson content remain available offline after they have been cached or installed.
+- **REQ-PWA-02:** Offline account sessions remain pending locally until foreground sync succeeds; pending rewards are not represented as authoritative.
+- **REQ-RACE-01:** Daily race submissions use a server-managed passage and server-computed text metrics; global display is opt-in and group results require existing membership.
+- **REQ-SETTINGS-01:** Weekly-goal and sound preferences sync per account with a timestamped, per-setting conflict policy; race identity and visibility remain opt-in account settings.
 
 ### Memorization and journeys
 - **REQ-MEMORY-01:** Memory challenge levels are: visible verse, selected missing words, major words hidden, and fully hidden verse.
@@ -115,3 +121,4 @@ Bible reading, memorization, and typing practice are usually separate activities
 5. Demo mode is visibly labeled; demo data cannot be mistaken for persisted production progress.
 6. Responsive, keyboard/screen-reader accessible core loop passes focused tests and a production build.
 7. Security rules deny cross-user reads/writes; progression cannot be client-awarded.
+8. The 15-stage curriculum, offline queue, install prompt, and server-backed opt-in race flows are documented with their current platform and integrity limits.
