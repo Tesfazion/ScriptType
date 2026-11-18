@@ -1,0 +1,113 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function isStaff() {
+      return signedIn() &&
+        request.auth.token.role in ["admin", "moderator", "content_editor"];
+    }
+
+    match /users/{uid} {
+      allow read: if isOwner(uid);
+      allow create, update: if isOwner(uid) &&
+        !request.resource.data.keys().hasAny([
+          "xp", "level", "activeStreak", "verseStreak",
+          "memoryStreak", "entitlements", "role"
+        ]);
+      allow delete: if false;
+
+      match /progress/{document=**} {
+        allow read: if isOwner(uid);
+        allow write: if false;
+      }
+
+      match /sessions/{document=**} {
+        allow read: if isOwner(uid);
+        allow write: if false;
+      }
+
+      match /journeys/{document=**} {
+        allow read: if isOwner(uid);
+        allow write: if false;
+      }
+
+      match /achievements/{document=**} {
+        allow read: if isOwner(uid);
+        allow write: if false;
+      }
+
+      match /journals/{document=**} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid) &&
+          request.resource.data.keys().hasOnly([
+            "reference", "body", "createdAt", "updatedAt", "retention"
+          ]);
+      }
+    }
+
+    match /contentVerses/{document=**} {
+      allow read: if resource.data.reviewStatus == "published";
+      allow write: if isStaff();
+    }
+
+    match /journeys/{document=**} {
+      allow read: if resource.data.visibility == "published";
+      allow write: if isStaff();
+    }
+
+    match /achievements/{document=**} {
+      allow read: if resource.data.active == true;
+      allow write: if isStaff();
+    }
+
+    match /groups/{groupId} {
+      function isMember() {
+        return signedIn() &&
+          exists(/databases/$(database)/documents/groups/$(groupId)/members/$(request.auth.uid));
+      }
+
+      allow read: if isMember();
+      allow write: if false;
+
+      match /members/{memberUid} {
+        allow read: if isMember();
+        allow write: if false;
+      }
+
+      match /challenges/{document=**} {
+        allow read: if isMember();
+        allow write: if false;
+      }
+
+      match /reports/{reportId} {
+        allow create: if isMember() &&
+          request.resource.data.reporterUid == request.auth.uid;
+        allow read: if signedIn() &&
+          (request.auth.uid == resource.data.reporterUid || isStaff());
+        allow update, delete: if isStaff();
+      }
+    }
+
+    match /entitlements/{uid} {
+      allow read: if isOwner(uid);
+      allow write: if false;
+    }
+
+    match /adminAudit/{document=**} {
+      allow read: if isStaff();
+      allow write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
