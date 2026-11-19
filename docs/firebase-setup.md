@@ -193,6 +193,22 @@ Firestore, deploy the rules/indexes/Function, and allowlist the Hosting domain
 in Firebase Authentication and App Check. Do not put Firebase Admin
 credentials or service-account keys in `NEXT_PUBLIC_*` variables.
 
+## 6. Deploy automatically from GitHub
+
+`.github/workflows/firebase-hosting.yml` builds and deploys the static site to
+the live Firebase Hosting channel whenever a commit reaches `main`. It also
+supports a manual run from the GitHub Actions tab. The workflow deploys Hosting
+only; Firestore rules, indexes, and Cloud Functions remain a separate,
+intentional deployment.
+
+The workflow reads the repository Actions secret
+`FIREBASE_SERVICE_ACCOUNT_SCRIPTTYPE_61C15`. Its service account needs the
+Firebase Hosting Admin and Service Usage Consumer roles on `scripttype-61c15`.
+Create or rotate its JSON key in Google Cloud IAM, then add the full JSON as a
+repository secret under **Settings → Secrets and variables → Actions**. Never
+commit the key, put it in a workflow file, or expose it in logs. The key is
+encrypted by GitHub as a repository secret and is not included in the build.
+
 ## Troubleshooting
 
 - **Sign-in says Firebase is not configured:** check that all four required

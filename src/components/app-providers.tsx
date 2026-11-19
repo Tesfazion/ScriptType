@@ -41,17 +41,9 @@ export function useAuth(): AuthState {
 export function AppProviders({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(firebaseConfigured);
-  const [isOnline, setIsOnline] = useState(() =>
-    typeof window === "undefined" ? true : window.navigator.onLine,
-  );
-  const [offlineSupportReady, setOfflineSupportReady] = useState(() =>
-    typeof window !== "undefined" && "serviceWorker" in window.navigator,
-  );
-  const [offlineSupportError, setOfflineSupportError] = useState(() =>
-    typeof window !== "undefined" && !("serviceWorker" in window.navigator)
-      ? "This browser does not support offline app storage."
-      : "",
-  );
+  const [isOnline, setIsOnline] = useState(true);
+  const [offlineSupportReady, setOfflineSupportReady] = useState(false);
+  const [offlineSupportError, setOfflineSupportError] = useState("");
   const [syncError, setSyncError] = useState("");
 
   useEffect(() => {
@@ -74,6 +66,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    queueMicrotask(() => setIsOnline(window.navigator.onLine));
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
     window.addEventListener("online", handleOnline);
@@ -88,6 +81,10 @@ export function AppProviders({ children }: { children: ReactNode }) {
             "Offline support could not start. Check your connection and reload ScriptType.",
           ),
         );
+    } else {
+      queueMicrotask(() =>
+        setOfflineSupportError("This browser does not support offline app storage."),
+      );
     }
 
     return () => {
