@@ -29,7 +29,7 @@ export default function JourneysPage() {
         <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">A path through Scripture</div>
         <h1 className="mt-2 text-3xl font-semibold tracking-[-0.06em] sm:text-4xl">Choose a journey.</h1>
         <p className="mt-3 text-sm leading-6 text-muted-foreground">
-          Take the next small step through a book, a theme, or a reading rhythm. Each path here is a curated preview with three sample passages.
+          Take the next small step through a book, a theme, or a reading rhythm. Each path includes three sample passages.
         </p>
       </div>
       {errorMessage && <p role="alert" className="mb-5 text-xs text-destructive">{errorMessage}</p>}
@@ -160,7 +160,7 @@ export default function JourneysPage() {
       <div className="mt-7 flex items-start gap-3 rounded-2xl border bg-card p-4 text-xs leading-5 text-muted-foreground">
         <Sparkles size={15} className="mt-0.5 shrink-0 text-primary" aria-hidden="true" />
         <p>
-          Journey content is a preview in this build. The full reading plans and verse schedules require editorial review and licensed content configuration before launch.
+          Journey content is available in this build. Full reading plans and verse schedules will be available after editorial review and licensed content configuration.
         </p>
       </div>
     </div>

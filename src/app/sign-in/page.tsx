@@ -4,7 +4,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BookOpenText, Check, CircleUserRound, Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
 import { FormEvent, useState } from "react";
-import { createAccount, signInWithEmail, signInWithGoogle } from "@/lib/auth";
+import {
+  createAccount,
+  sendPasswordResetEmail,
+  signInWithEmail,
+  signInWithGoogle,
+} from "@/lib/auth";
 import { useAuth } from "@/components/app-providers";
 
 export default function SignInPage() {
@@ -17,6 +22,9 @@ export default function SignInPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
+  const [showReset, setShowReset] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetSent, setResetSent] = useState(false);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -44,6 +52,20 @@ export default function SignInPage() {
       router.push("/today");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Google sign-in could not be completed.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function submitReset(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSubmitting(true);
+    setMessage("");
+    try {
+      await sendPasswordResetEmail(resetEmail);
+      setResetSent(true);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Password reset could not be completed.");
     } finally {
       setSubmitting(false);
     }
@@ -150,9 +172,46 @@ export default function SignInPage() {
                   {submitting ? "Please wait…" : mode === "sign-in" ? "Sign in" : "Create account"}
                 </button>
               </form>
-              <p className="mt-5 text-center text-xs leading-5 text-muted-foreground">
-                By continuing, you agree to ScriptType&apos;s terms and privacy choices.
+
+              <p className="mt-5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                By continuing, you agree to ScriptType&apos;s <Link href="/terms" className="underline hover:text-foreground">terms</Link> and <Link href="/privacy" className="underline hover:text-foreground">privacy choices</Link>.
               </p>
+
+              {mode === "sign-in" && !showReset && (
+                <button type="button" onClick={() => setShowReset(true)} className="mt-4 w-full text-xs font-semibold text-primary underline underline-offset-2">
+                  Forgot password?
+                </button>
+              )}
+
+              {mode === "sign-in" && showReset && (
+                <form onSubmit={submitReset} className="mt-4 space-y-4 rounded-control border border-primary/20 bg-accent p-4">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-xs font-semibold">Reset your password</p>
+                    {!resetSent && (
+                      <button type="button" onClick={() => setShowReset(false)} className="text-xs font-semibold text-primary">Cancel</button>
+                    )}
+                  </div>
+                  {resetSent ? (
+                    <p className="text-xs text-muted-foreground">
+                      Check {resetEmail} for a password reset email.
+                    </p>
+                  ) : (
+                    <div className="space-y-3">
+                      <label className="block text-xs font-semibold">
+                        Email
+                        <span className="relative block">
+                          <Mail size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+                          <input type="email" value={resetEmail} onChange={(event) => setResetEmail(event.target.value)} required autoComplete="email" className="field-control mt-2 w-full pl-11 pr-4 text-sm font-normal" />
+                        </span>
+                      </label>
+                      {message && <p role="alert" className="rounded-control border border-destructive/20 bg-destructive/5 px-4 py-3 text-xs text-destructive">{message}</p>}
+                      <button type="submit" disabled={!firebaseConfigured || submitting} className="button-primary w-full text-xs disabled:cursor-not-allowed disabled:opacity-50">
+                        {submitting ? "Sending…" : "Send reset link"}
+                      </button>
+                    </div>
+                  )}
+                </form>
+              )}
             </>
           )}
         </div>

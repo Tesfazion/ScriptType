@@ -157,7 +157,7 @@ export default function SettingsPage() {
     window.localStorage.removeItem("scripttype.device-progress.v1");
     window.localStorage.removeItem("scripttype.private-reflections.v1");
     setGoal(5);
-    setMessage("Local demo progress and reflections deleted.");
+    setMessage("Local progress and reflections deleted.");
   }
 
   async function saveRaceAlias() {
@@ -297,7 +297,7 @@ export default function SettingsPage() {
           <div>
             <h2 className="text-sm font-semibold">Privacy choices</h2>
             <p className="mt-1 text-xs leading-5 text-muted-foreground">
-              Journals and private reflection stay local in the demo. Firebase account data, groups, and analytics require separate consent/rights configuration before production.
+              Journals and private reflection stay local in this build. Firebase account data, groups, and analytics require separate consent/rights configuration before launch.
             </p>
           </div>
         </div>
@@ -313,7 +313,7 @@ export default function SettingsPage() {
 
       <section className="surface-card mt-5 p-card sm:p-7">
         <h2 className="text-sm font-semibold">Account</h2>
-        <p className="mt-1 text-xs text-muted-foreground">{user ? `Signed in as ${user.email ?? "your Firebase account"}` : "Device-only preview. No account is connected."}</p>
+        <p className="mt-1 text-xs text-muted-foreground">{user ? `Signed in as ${user.email ?? "your Firebase account"}` : "No account is connected."}</p>
       </section>
 
       {message && <p role="status" className="mt-5 text-xs text-muted-foreground">{message}</p>}

@@ -44,3 +44,27 @@ next-env.d.ts
 
 # Firebase Functions build output
 /functions/lib
+
+# Local editor/tool artifacts (do not commit)
+.kilo/
+shot.mjs
+*.log
+
+# Firebase local cache
+.firebase/
+
+# Root screenshot assets (unreferenced; debug outputs)
+admin.png
+audio.png
+community.png
+journeys.png
+landing.png
+memory.png
+practice.png
+profile.png
+progress.png
+reflection.png
+settings.png
+sign-in.png
+today.png
+trainer.png

@@ -1,10 +1,27 @@
 "use client";
 
+import { useAuth } from "@/components/app-providers";
 import { BookOpenText, CircleCheck, Compass, FileClock, Flag, Plus, ShieldCheck, UsersRound } from "lucide-react";
 import { useState } from "react";
+import Link from "next/link";
 
 export default function AdminPage() {
+  const { user, firebaseConfigured } = useAuth();
   const [message, setMessage] = useState("");
+
+  if (!user || !firebaseConfigured) {
+    return (
+      <div className="mx-auto max-w-[1080px] float-in">
+        <div className="mb-7 text-center">
+          <h1 className="page-title">Access denied</h1>
+          <p className="mt-4 text-sm text-muted-foreground">
+            Admin studio requires a signed-in Firebase account with staff privileges.
+          </p>
+        </div>
+        <Link href="/sign-in" className="button-primary mt-6">Sign in</Link>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-[1080px] float-in">
@@ -14,16 +31,16 @@ export default function AdminPage() {
           <h1 className="page-title mt-2">Scripture, thoughtfully published.</h1>
         </div>
         <span className="inline-flex min-h-9 items-center gap-2 rounded-full border border-primary/20 bg-accent px-3 text-xs font-semibold text-accent-foreground">
-          <ShieldCheck size={12} aria-hidden="true" /> Staff preview
+          <ShieldCheck size={12} aria-hidden="true" /> Build support
         </span>
       </div>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {[
-          { label: "Published verses", value: "8", icon: BookOpenText },
+          { label: "Published verses", value: "20", icon: BookOpenText },
           { label: "Sample journeys", value: "5", icon: Compass },
           { label: "Open safety reports", value: "0", icon: Flag },
-          { label: "Admin audit events", value: "Preview", icon: FileClock },
+          { label: "Admin audit events", value: "0", icon: FileClock },
         ].map(({ label, value, icon: Icon }) => (
           <article key={label} className="surface-card p-card">
             <Icon size={17} className="text-primary" aria-hidden="true" />
@@ -82,7 +99,7 @@ export default function AdminPage() {
       {message && <p role="status" className="mt-5 rounded-xl border bg-card px-4 py-3 text-xs text-muted-foreground">{message}</p>}
 
       <p className="mt-5 text-[10px] leading-5 text-muted-foreground">
-        Admin functionality is a preview only in this build. Production publishing and user management require role claims, server validation, audit events, and independent authorization.
+        Admin functionality is limited in this build. Production publishing and user management require role claims, server validation, audit events, and independent authorization.
       </p>
     </div>
   );

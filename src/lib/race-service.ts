@@ -136,7 +136,16 @@ export async function readRaceSettings(): Promise<{
   const snapshot = await getDoc(doc(firestore, "users", user.uid));
   const settings = snapshot.data()?.raceSettings;
   if (!settings || typeof settings !== "object") {
-    return { alias: "", globalOptIn: false };
+    // Fall back to localStorage if Firestore has no saved settings
+    return {
+      alias:
+        typeof window !== "undefined"
+          ? (window.localStorage.getItem("scripttype.race.alias") ?? "") : "",
+      globalOptIn:
+        typeof window !== "undefined"
+          ? window.localStorage.getItem("scripttype.race.global-opt-in") === "on"
+          : false,
+    };
   }
   const value = settings as Record<string, unknown>;
   return {
