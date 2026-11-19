@@ -254,9 +254,9 @@ return (
                 Build a skill. Keep the words that matter close.
               </p>
             </div>
-            <div className="relative flex-shrink-0">
+            <div className="flex flex-col items-center gap-3 sm:flex-row">
               <Mascot size="hero" animate className="mascot-hero-3d" />
-              <Link href="/profile" className="absolute -bottom-6 -right-6 button-secondary min-h-10 px-3 text-xs opacity-90 hover:opacity-100">
+              <Link href="/profile" className="button-secondary min-h-10 px-3 text-xs opacity-90 hover:opacity-100">
                 <span className="grid size-7 place-items-center rounded-full bg-primary/10 font-semibold text-primary">
                   {displayName.slice(0, 1).toLocaleUpperCase()}
                 </span>
