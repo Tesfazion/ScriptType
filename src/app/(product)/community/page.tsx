@@ -207,7 +207,7 @@ export default function CommunityPage() {
       <div className="mt-5 flex items-start gap-3 rounded-2xl border border-dashed p-4 text-xs leading-5 text-muted-foreground">
         <Crown size={15} className="mt-0.5 shrink-0 text-primary" aria-hidden="true" />
         <p>
-          This product preview is intentionally not open to unmoderated interaction. Production group features remain gated behind moderation, reporting, age/privacy, and account controls.
+          Community groups are not yet open in this build. Production group features remain gated behind moderation, reporting, age/privacy, and account controls.
         </p>
       </div>
 

@@ -1,6 +1,7 @@
 import {
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
+  sendPasswordResetEmail as firebaseSendPasswordResetEmail,
   signInWithEmailAndPassword,
   signInWithPopup,
   updateProfile,
@@ -36,4 +37,8 @@ export async function createAccount(
 
 export async function signInWithGoogle() {
   return signInWithPopup(requireAuth(), new GoogleAuthProvider());
+}
+
+export async function sendPasswordResetEmail(email: string) {
+  return firebaseSendPasswordResetEmail(requireAuth(), email);
 }

@@ -296,7 +296,7 @@ export function ChallengeRunner({
     const nextValue = value.slice(0, verse.text.length);
     if (startTime === null && nextValue.length > 0) {
       setStartTime(performance.now());
-      setAnnouncement("Practice started. Your progress is saved on this device in demo mode.");
+      setAnnouncement("Practice started. Your progress is saved on this device.");
     }
 
     if (nextValue.length > typed.length) {
@@ -509,7 +509,7 @@ export function ChallengeRunner({
                 ? "Saved offline · waiting for verified account sync."
                 : completion.synced
                   ? "Saved and verified with your account."
-                  : "Device demo · this progress is saved only in this browser."}
+                  : "This progress is saved only in this browser."}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               {completion.nextStageId && (
@@ -587,7 +587,7 @@ export function ChallengeRunner({
               : "Account progress · offline"
             : firebaseConfigured
               ? "Sign in to sync your progress"
-              : "Saved on this device in demo mode"}
+              : "Saved on this device"}
         </div>
       </div>
 
@@ -624,7 +624,7 @@ export function ChallengeRunner({
       )}
       {mode === "race" && !user && (
         <p className="mb-4 text-xs text-muted-foreground">
-          Sign in to submit a leaderboard result. You can still practice the passage in demo mode.{" "}
+          Sign in to submit a leaderboard result. You can still practice the passage locally.{" "}
           <Link href="/sign-in" className="font-semibold text-primary underline underline-offset-2">
             Sign in
           </Link>

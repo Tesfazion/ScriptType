@@ -18,6 +18,21 @@ import { AchievementShare } from "@/components/achievement-share";
 import { useProgress } from "@/hooks/use-progress";
 import { getTypingBadgeIds, getTypingLevelProgress, typingBadges } from "../../../../shared/typing-progress";
 
+function getLocalDateKey(date: Date): string {
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, "0"),
+    String(date.getDate()).padStart(2, "0"),
+  ].join("-");
+}
+
+function getWeekStart(): Date {
+  const date = new Date();
+  date.setHours(0, 0, 0, 0);
+  date.setDate(date.getDate() - ((date.getDay() + 6) % 7));
+  return date;
+}
+
 function TrendChart({ values }: { values: number[] }) {
   if (values.length < 2) {
     return (
@@ -91,6 +106,7 @@ export default function ProgressPage() {
     perfectLessons: progress?.perfectLessons ?? 0,
     wordsTyped: progress?.wordsTyped ?? 0,
   });
+  const qualifiedDates = new Set(progress?.qualifiedDates ?? []);
 
   return (
     <div className="float-in">
@@ -101,7 +117,7 @@ export default function ProgressPage() {
           <p className="mt-2 text-sm text-muted-foreground">Every practice is a beginning worth counting.</p>
         </div>
         <span className="rounded-full border bg-card px-3 py-1.5 text-[10px] text-muted-foreground">
-          {user ? "Account progress" : "Device demo"}
+          {user ? "Account progress" : "Device progress"}
         </span>
       </div>
 
@@ -180,19 +196,28 @@ export default function ProgressPage() {
             <span className="text-xs font-semibold text-primary">{progress?.weeklySessions ?? 0}/{progress?.weeklyGoal ?? 5}</span>
           </div>
           <div className="mt-6 grid grid-cols-7 gap-2">
-            {["M", "T", "W", "T", "F", "S", "S"].map((day, index) => {
-              const active = (progress?.qualifiedDates.length ?? 0) > index;
-              return (
-                <div key={`${day}-${index}`} className="text-center">
-                  <span className={`mx-auto grid aspect-square max-w-10 place-items-center rounded-xl text-[10px] ${
-                    active ? "bg-growth text-white" : "bg-muted text-muted-foreground"
-                  }`}>
-                    {active ? <Check size={13} aria-label="Practice completed" /> : "·"}
-                  </span>
-                  <span className="mt-2 block text-[9px] text-muted-foreground">{day}</span>
-                </div>
-              );
-            })}
+            {(() => {
+              const weekStart = getWeekStart();
+              const weekDays = Array.from({ length: 7 }, (_, index) => {
+                const date = new Date(weekStart);
+                date.setDate(weekStart.getDate() + index);
+                return date;
+              });
+              return weekDays.map((date) => {
+                const dateKey = getLocalDateKey(date);
+                const isComplete = qualifiedDates.has(dateKey);
+                return (
+                  <div key={dateKey} className="text-center">
+                    <span className={`mx-auto grid aspect-square max-w-10 place-items-center rounded-xl text-[10px] ${
+                      isComplete ? "bg-growth text-white" : "bg-muted text-muted-foreground"
+                    }`}>
+                      {isComplete ? <Check size={13} aria-label="Practice completed" /> : date.getDate()}
+                    </span>
+                    <span className="mt-2 block text-[9px] text-muted-foreground">{date.toLocaleDateString(undefined, { weekday: "narrow" })}</span>
+                  </div>
+                );
+              });
+            })()}
           </div>
           <p className="mt-5 text-[10px] leading-5 text-muted-foreground">
             Your weekly goal is {progress?.weeklyGoal ?? 5} practice days. Progress is personal—there&apos;s no penalty for taking a day off.

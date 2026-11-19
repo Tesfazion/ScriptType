@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
 import {
   AudioLines,
   BookOpen,
@@ -13,7 +14,6 @@ import {
   House,
   Keyboard,
   Settings2,
-  ShieldCheck,
   Sparkles,
   UserRound,
   UsersRound,
@@ -32,16 +32,17 @@ const navigation = [
     icon: ChartNoAxesColumnIncreasing,
     mobile: true,
   },
-  { href: "/community", label: "Community", icon: UsersRound, mobile: true },
   { href: "/profile", label: "You", icon: UserRound, mobile: true },
-  { href: "/memory", label: "Memory", icon: Heart, mobile: false },
-  { href: "/trainer", label: "Keyboard trainer", icon: Keyboard, mobile: false },
-  { href: "/audio", label: "Listen", icon: AudioLines, mobile: false },
-  { href: "/reflection", label: "Reflection", icon: Sparkles, mobile: false },
+  { href: "/memory", label: "Memory", icon: Heart, mobile: true },
+  { href: "/trainer", label: "Trainer", icon: Keyboard, mobile: true },
+  { href: "/audio", label: "Listen", icon: AudioLines, mobile: true },
+  { href: "/reflection", label: "Reflection", icon: Sparkles, mobile: true },
+  { href: "/community", label: "Community", icon: UsersRound, mobile: true },
 ];
 
 export function ProductShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const {
     user,
     firebaseConfigured,
@@ -51,6 +52,33 @@ export function ProductShell({ children }: { children: React.ReactNode }) {
   } = useAuth();
   const isActive = (href: string) =>
     pathname === href || (href !== "/today" && pathname.startsWith(`${href}/`));
+
+  useEffect(() => {
+    const shortcutRoutes: Record<string, string> = {
+      "1": "/today",
+      "2": "/practice",
+      "3": "/memory",
+      "4": "/audio",
+      "5": "/trainer",
+      "6": "/progress",
+      "7": "/journeys",
+      "8": "/reflection",
+      "9": "/profile",
+      "0": "/community",
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (!event.altKey) return;
+      const target = event.target as HTMLElement | null;
+      if (target?.closest("input, textarea, select, [contenteditable='true']")) return;
+      const href = shortcutRoutes[event.key];
+      if (href) {
+        event.preventDefault();
+        router.push(href);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [router]);
 
   return (
     <div className="page-shell">
@@ -137,17 +165,6 @@ export function ProductShell({ children }: { children: React.ReactNode }) {
               <Settings2 size={17} aria-hidden="true" />
               Settings
             </Link>
-            <Link
-              href="/admin"
-              className={`mt-1 flex min-h-11 items-center gap-3 rounded-control px-3 text-sm font-medium ${
-                isActive("/admin")
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              }`}
-            >
-              <ShieldCheck size={17} aria-hidden="true" />
-              Admin studio
-            </Link>
           </div>
         </aside>
 
@@ -176,8 +193,8 @@ export function ProductShell({ children }: { children: React.ReactNode }) {
                 {user
                   ? "Synced account"
                   : firebaseConfigured
-                    ? "Device preview"
-                    : "Device demo"}
+                    ? "Signed-in mode"
+                    : "Device-only mode"}
               </span>
               <span
                 className={`hidden min-h-9 items-center gap-2 rounded-full border px-3 text-xs font-medium sm:inline-flex ${
@@ -191,6 +208,13 @@ export function ProductShell({ children }: { children: React.ReactNode }) {
                 {!isOnline ? "Working offline" : offlineSupportReady ? "Offline ready" : "Connecting"}
               </span>
               <PwaInstallButton />
+              <Link
+                href="/settings"
+                className="grid size-10 place-items-center rounded-full border bg-card text-muted-foreground hover:text-foreground lg:hidden"
+                aria-label="Settings"
+              >
+                <Settings2 size={16} aria-hidden="true" />
+              </Link>
               <ThemeToggle />
               {user ? (
                 <Link

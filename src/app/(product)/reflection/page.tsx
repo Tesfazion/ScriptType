@@ -97,13 +97,13 @@ export default function ReflectionPage() {
         <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">Private reflection</div>
         <h1 className="page-title mt-2">Take one honest moment.</h1>
         <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
-          A journal is for notice and application, not a spiritual performance. These notes stay in this browser in the demo.
+          A journal is for notice and application, not a spiritual performance. These notes stay in this browser.
         </p>
       </div>
 
       <div className="flex items-start gap-3 rounded-card border border-primary/20 bg-accent p-4 text-accent-foreground">
         <LockKeyhole size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
-        <p className="text-xs leading-5">Private by default. Demo reflections are stored only on this device and are never sent to analytics or AI.</p>
+        <p className="text-xs leading-5">Private by default. Reflections are stored only on this device and are never sent to analytics or AI.</p>
       </div>
 
       <form onSubmit={saveEntry} className="surface-card mt-5 p-card sm:p-7">

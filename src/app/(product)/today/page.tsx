@@ -146,12 +146,12 @@ export default function TodayPage() {
   const recentSessions = [...(progress?.sessions ?? [])].slice(0, 7).reverse();
   const unlockedBadgeIds = Array.from(new Set([
     ...getTypingBadgeIds({
-    completedLessons: progress?.sessions.filter((session) => session.mode === "keyboard").length ?? 0,
-    completedStageIds: progress?.completedKeyboardStageIds ?? [],
-    streak: progress?.activeStreak ?? 0,
-    bestWpm: progress?.bestWpm ?? 0,
-    perfectLessons: progress?.perfectLessons ?? 0,
-    wordsTyped: progress?.wordsTyped ?? 0,
+      completedLessons: progress?.sessions.filter((session) => session.mode === "keyboard").length ?? 0,
+      completedStageIds: progress?.completedKeyboardStageIds ?? [],
+      streak: progress?.activeStreak ?? 0,
+      bestWpm: progress?.bestWpm ?? 0,
+      perfectLessons: progress?.perfectLessons ?? 0,
+      wordsTyped: progress?.wordsTyped ?? 0,
     }),
     ...(progress?.achievementIds ?? []),
   ]));
@@ -262,6 +262,25 @@ export default function TodayPage() {
           </article>
         ))}
       </section>
+
+      <article className="surface-card p-4 sm:p-5" aria-labelledby="current-level">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="eyebrow">Your journey level</p>
+            <h2 id="current-level" className="mt-1 text-base font-semibold">Level {typingLevel.level} · {typingLevel.rank}</h2>
+            <p className="mt-1 text-[10px] text-muted-foreground">{(progress?.xp ?? 0).toLocaleString()} XP · {typingLevel.xpInLevel} XP in level</p>
+          </div>
+          <Link href="/profile" className="button-quiet min-h-10 px-2 text-xs">
+            View details <ArrowRight size={14} aria-hidden="true" />
+          </Link>
+        </div>
+        <div className="mt-4 h-2 overflow-hidden rounded-full bg-muted" role="progressbar" aria-label="Progress to next level" aria-valuemin={0} aria-valuemax={100} aria-valuenow={typingLevel.progressPercent}>
+          <div className="progress-fill h-full rounded-full bg-primary" style={{ width: `${typingLevel.progressPercent}%` }} />
+        </div>
+        <p className="mt-2 text-[10px] text-muted-foreground">
+          {typingLevel.xpNeeded - typingLevel.xpInLevel} XP to level {typingLevel.level + 1}
+        </p>
+      </article>
 
       {errorMessage && (
         <p role="alert" className="rounded-lg border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive">

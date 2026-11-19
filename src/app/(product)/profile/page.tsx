@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { signOut } from "firebase/auth";
+import { signOut, updateProfile as updateFirebaseProfile } from "firebase/auth";
 import { ArrowRight, Flame, Gauge, Target, Trophy } from "lucide-react";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { useAuth } from "@/components/app-providers";
 import { useProgress } from "@/hooks/use-progress";
 import { firebaseAuth } from "@/lib/firebase";
@@ -15,6 +15,9 @@ export default function ProfilePage() {
   const [message, setMessage] = useState("");
   const level = getTypingLevelProgress(progress?.xp ?? 0);
   const displayName = user?.displayName || user?.email?.split("@")[0] || "Guest learner";
+  const [editingName, setEditingName] = useState(false);
+  const [nameDraft, setNameDraft] = useState("");
+  const [savingName, setSavingName] = useState(false);
 
   async function handleSignOut() {
     if (!firebaseAuth) {
@@ -26,6 +29,30 @@ export default function ProfilePage() {
       await signOut(firebaseAuth);
     } catch {
       setMessage("We couldn’t sign you out. Please try again.");
+    }
+  }
+
+  async function handleSaveName(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!firebaseAuth?.currentUser || !user) {
+      setMessage("Sign in to update your display name.");
+      return;
+    }
+    const nextName = nameDraft.trim();
+    if (nextName.length < 2) {
+      setMessage("Display name must be at least 2 characters.");
+      return;
+    }
+    setSavingName(true);
+    setMessage("");
+    try {
+      await updateFirebaseProfile(firebaseAuth.currentUser, { displayName: nextName });
+      setEditingName(false);
+      setMessage("Display name updated.");
+    } catch {
+      setMessage("We couldn’t update your display name. Please try again.");
+    } finally {
+      setSavingName(false);
     }
   }
 
@@ -136,7 +163,7 @@ export default function ProfilePage() {
 
       <section className="surface-card mt-5 flex flex-wrap items-center justify-between gap-4 p-5">
         <div>
-          <p className="text-sm font-semibold">{user ? "Signed-in account" : "Device demo"}</p>
+          <p className="text-sm font-semibold">{user ? "Signed-in account" : "Local device"}</p>
           <p className="mt-1 text-xs text-muted-foreground">
             {user?.email ?? (user ? "Progress syncs with your account." : "Progress is saved in this browser only.")}
           </p>
@@ -149,6 +176,52 @@ export default function ProfilePage() {
           <Link href="/sign-in" className="button-primary">Sign in to sync</Link>
         )}
       </section>
+
+      {user && (
+        <section className="surface-card mt-5 p-5" aria-labelledby="edit-display-name">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <p className="eyebrow">Profile</p>
+              <h2 id="edit-display-name" className="mt-1 text-base font-semibold">Your display name</h2>
+            </div>
+            {editingName ? (
+              <button type="button" className="button-quiet min-h-10 px-2 text-xs" onClick={() => setEditingName(false)}>
+                Cancel
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="button-quiet min-h-10 px-2 text-xs"
+                onClick={() => {
+                  setNameDraft(user.displayName || user.email?.split("@")[0] || "Guest learner");
+                  setEditingName(true);
+                }}
+              >
+                Edit name
+              </button>
+            )}
+          </div>
+          {editingName ? (
+            <form onSubmit={handleSaveName} className="mt-4 flex flex-wrap items-end gap-3">
+              <label className="block text-xs font-semibold">
+                Display name
+                <input
+                  value={nameDraft}
+                  onChange={(event) => setNameDraft(event.target.value)}
+                  minLength={2}
+                  autoComplete="name"
+                  className="field-control mt-2 w-full max-w-xs px-4 text-sm font-normal"
+                />
+              </label>
+              <button type="submit" disabled={savingName} className="button-primary min-h-11 px-4 text-xs disabled:opacity-50">
+                {savingName ? "Saving…" : "Save name"}
+              </button>
+            </form>
+          ) : (
+            <p className="mt-3 text-xs text-muted-foreground">{displayName}</p>
+          )}
+        </section>
+      )}
     </div>
   );
 }

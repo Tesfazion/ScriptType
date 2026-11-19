@@ -31,7 +31,7 @@ export function JourneyDetail({ journey }: { journey: Journey }) {
               {doneCount} of {journey.verseIds.length} sample steps complete
             </span>
             <span className="rounded-full border border-white/20 bg-white/10 px-3 py-2 text-xs text-white">
-              Preview content
+              Sample content
             </span>
           </div>
         </div>
@@ -69,7 +69,7 @@ export function JourneyDetail({ journey }: { journey: Journey }) {
 
       <p className="mt-5 flex items-start gap-2 text-[10px] leading-5 text-muted-foreground">
         <Sparkles size={13} className="mt-0.5 shrink-0 text-primary" aria-hidden="true" />
-        This sample journey has three passages in the current preview. Full reading schedules will be published after editorial review.
+        This sample journey includes three passages. Full reading schedules will be published after editorial review.
       </p>
     </div>
   );
