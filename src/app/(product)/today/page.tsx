@@ -236,26 +236,36 @@ export default function TodayPage() {
     );
   }
 
-  return (
+return (
     <div className="float-in mx-auto max-w-[1160px] space-y-5">
-      <header className="flex flex-wrap items-end justify-between gap-3">
-<div>
-            <div className="flex items-center gap-2">
-              <BrandMark size="xs" />
-              <p className="eyebrow">Your learning home</p>
+      <section className="relative">
+        <div className="mission-glow relative overflow-hidden rounded-panel p-6 text-white shadow-panel sm:p-10">
+          <div className="pointer-events-none absolute -right-16 -top-24 size-72 rounded-full border border-white/10" aria-hidden="true" />
+          <div className="relative flex flex-wrap items-center justify-between gap-6">
+            <div className="flex-1 min-w-[280px]">
+              <div className="flex items-center gap-2">
+                <BrandMark size="xs" />
+                <p className="eyebrow text-white/65">Your learning home</p>
+              </div>
+              <h1 className="mt-2 text-3xl font-semibold tracking-[-0.06em] sm:text-4xl">
+                Good to see you, {displayName}.
+              </h1>
+              <p className="mt-2 text-sm leading-6 text-white/70">
+                Build a skill. Keep the words that matter close.
+              </p>
             </div>
-          <h1 className="page-title mt-1.5">Good to see you, {displayName}.</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Build a skill. Keep the words that matter close.
-          </p>
+            <div className="relative flex-shrink-0">
+              <Mascot size="hero" animate className="mascot-hero-3d" />
+              <Link href="/profile" className="absolute -bottom-6 -right-6 button-secondary min-h-10 px-3 text-xs opacity-90 hover:opacity-100">
+                <span className="grid size-7 place-items-center rounded-full bg-primary/10 font-semibold text-primary">
+                  {displayName.slice(0, 1).toLocaleUpperCase()}
+                </span>
+                Level {typingLevel.level} · {typingLevel.rank}
+              </Link>
+            </div>
+          </div>
         </div>
-        <Link href="/profile" className="button-secondary min-h-10 px-3 text-xs">
-          <span className="grid size-7 place-items-center rounded-full bg-primary/10 font-semibold text-primary">
-            {displayName.slice(0, 1).toLocaleUpperCase()}
-          </span>
-          Level {typingLevel.level} · {typingLevel.rank}
-        </Link>
-      </header>
+      </section>
 
       <section className="grid gap-3 lg:grid-cols-[minmax(0,1.35fr)_minmax(16rem,0.65fr)]">
         <article className="mission-glow relative overflow-hidden rounded-panel p-5 text-white shadow-panel sm:p-6">
