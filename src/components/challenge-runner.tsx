@@ -127,7 +127,7 @@ function CharacterGuide({
 }) {
   return (
     <p
-      className="reading-type text-[1.4rem] leading-[1.75] tracking-[0.005em] sm:text-[1.7rem]"
+      className="reading-type text-[1.2rem] leading-[1.8] tracking-[0.005em] text-foreground sm:text-[1.7rem] sm:leading-[1.75] break-words overflow-wrap-anywhere whitespace-normal"
       aria-label={verse.text}
     >
       {Array.from(verse.text).map((character, index) => {

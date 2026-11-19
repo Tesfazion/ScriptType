@@ -138,7 +138,7 @@ export function KeyboardCoach({
         </div>
       </div>
 
-      <div className="mt-3 grid grid-cols-2 gap-4 border-t pt-3 hidden sm:block">
+      <div className="mt-3 grid grid-cols-2 gap-4 border-t pt-3 hidden lg:block">
         <HandGuide hand="left" activeFinger={guidance.finger} />
         <HandGuide hand="right" activeFinger={guidance.finger} />
       </div>
