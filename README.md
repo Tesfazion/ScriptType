@@ -12,7 +12,7 @@ A guided keyboard curriculum meets Scripture practice, memory, and meaningful da
 
 ScriptType is a typing practice application that turns keyboard skill-building into a clear, rewarding learning path. Practice typing with live character feedback, follow a 15-lesson beginner curriculum, and keep Scripture memory, audio recall, and reflection as meaningful parts of your journey.
 
-The app is a Next.js (App Router) web app that works as a Progressive Web App (PWA), so users can install it on phones and desktops — the ScrptType logo appears as the app icon on your home screen or desktop shortcut.
+The app is a Next.js (App Router) web app that works as a Progressive Web App (PWA), so users can install it on phones and desktops — the ScriptType logo appears as the app icon on your home screen or desktop shortcut.
 
 ---
 
@@ -37,7 +37,7 @@ The app is a Next.js (App Router) web app that works as a Progressive Web App (P
 
 ## App Icon (PWA)
 
-The ScrptType logo (`src/app/ScrptType logo.png`) is the app icon used when the app is installed on a phone or desktop:
+The ScriptType logo (`src/app/ScrptType logo.png`) is the app icon used when the app is installed on a phone or desktop:
 
 - `public/scripttype-icon-192.png` — 192×192 icon (manifest + Apple touch icon)
 - `public/scripttype-icon-512.png` — 512×512 maskable icon

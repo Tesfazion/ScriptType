@@ -2,11 +2,9 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   AudioLines,
-  BookOpen,
-  BookOpenText,
   ChartNoAxesColumnIncreasing,
   Compass,
   Flame,
@@ -19,13 +17,15 @@ import {
   UsersRound,
 } from "lucide-react";
 import { useAuth } from "@/components/app-providers";
+import { BrandMark } from "@/components/brand-mark";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { PwaInstallButton } from "@/components/pwa-install-button";
+import { Onboarding } from "@/components/onboarding";
 
 const navigation = [
   { href: "/today", label: "Today", icon: House, mobile: true },
   { href: "/journeys", label: "Journeys", icon: Compass, mobile: true },
-  { href: "/practice", label: "Practice", icon: BookOpenText, mobile: true },
+  { href: "/practice", label: "Practice", icon: Keyboard, mobile: true },
   {
     href: "/progress",
     label: "Growth",
@@ -43,6 +43,7 @@ const navigation = [
 export function ProductShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const {
     user,
     firebaseConfigured,
@@ -50,6 +51,11 @@ export function ProductShell({ children }: { children: React.ReactNode }) {
     offlineSupportReady,
     offlineSupportError,
   } = useAuth();
+
+  useEffect(() => {
+    const id = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(id);
+  }, []);
   const isActive = (href: string) =>
     pathname === href || (href !== "/today" && pathname.startsWith(`${href}/`));
 
@@ -82,6 +88,7 @@ export function ProductShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="page-shell">
+      {mounted && <Onboarding />}
       <a
         href="#main-content"
         className="sr-only z-50 rounded-full bg-primary px-4 py-2 text-primary-foreground focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
@@ -91,9 +98,7 @@ export function ProductShell({ children }: { children: React.ReactNode }) {
       <div className="mx-auto flex min-h-dvh max-w-[1480px]">
         <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col border-r border-sidebar-border bg-sidebar px-4 py-6 lg:flex">
           <Link href="/today" className="flex items-center gap-3 px-2">
-            <span className="brand-mark" aria-hidden="true">
-              <BookOpen size={17} strokeWidth={2.2} />
-            </span>
+            <BrandMark size="sm" priority />
             <span>
               <span className="block text-base font-semibold tracking-tight">
                 ScriptType
@@ -171,9 +176,7 @@ export function ProductShell({ children }: { children: React.ReactNode }) {
         <div className="min-w-0 flex-1">
           <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/90 px-4 backdrop-blur-xl sm:px-7 lg:px-10">
             <Link href="/today" className="flex items-center gap-2.5 lg:hidden">
-              <span className="brand-mark size-8">
-                <BookOpen size={16} aria-hidden="true" />
-              </span>
+              <BrandMark size="sm" priority />
               <span className="text-sm font-semibold tracking-tight">ScriptType</span>
             </Link>
             <div className="hidden text-xs text-muted-foreground lg:block">

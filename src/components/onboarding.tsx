@@ -1,88 +1,276 @@
 "use client";
 
-import { BookOpenText, ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
+import { ChevronRight, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
+import { BrandMark } from "@/components/brand-mark";
+import { Mascot } from "@/components/mascot";
 
-const onboardingSteps = [
-  {
-    title: "Practice typing",
-    description: "Type Scripture passages to build speed and accuracy. Progress syncs across devices when you sign in.",
-  },
-  {
-    title: "Follow a journey",
-    description: "Walk through curated reading plans — Gospels, Psalms, Proverbs — with sample passages to get started.",
-  },
-  {
-    title: "Earn badges",
-    description: "Streaks, levels, and accuracy milestones recognize consistency — not spiritual worth.",
-  },
-];
+type OnboardingStep =
+  | "welcome"
+  | "try-first"
+  | "personalize"
+  | "consent"
+  | "complete";
 
-const storageKey = "scripttype-onboarding-seen";
+const personalizationOptions = [
+  {
+    id: "journeys",
+    label: "Scripture journeys",
+    description: "Curated reading plans with guided typing.",
+  },
+  {
+    id: "keyboard",
+    label: "Keyboard trainer",
+    description: "Guided key, finger, and home-row placement.",
+  },
+  {
+    id: "memory",
+    label: "Memory & audio",
+    description: "Recall verses and listen-and-type practice.",
+  },
+] as const;
 
 export function Onboarding() {
-  const [step, setStep] = useState(0);
-  const [hasSeen, setHasSeen] = useState<boolean>(
-    () => typeof window !== "undefined" && !!window.sessionStorage.getItem(storageKey),
-  );
+  const [step, setStep] = useState<OnboardingStep>(() => {
+    if (typeof window === "undefined") return "welcome";
+    return sessionStorage.getItem("scripttype-show-onboarding-after-win") === "1"
+      ? "personalize"
+      : "welcome";
+  });
+  const [isSkippable, setIsSkippable] = useState(false);
+  const [weeklyGoal, setWeeklyGoal] = useState(5);
+  const [journeyPreference, setJourneyPreference] = useState("journeys");
+  const [consent, setConsent] = useState(false);
 
   useEffect(() => {
-    if (step >= onboardingSteps.length - 1) {
-      window.sessionStorage?.setItem?.(storageKey, "1");
-    }
-  }, [step]);
+    // Allow skip after 3 seconds so the user has read the welcome.
+    const timer = setTimeout(() => setIsSkippable(true), 3000);
+    return () => clearTimeout(timer);
+  }, []);
 
-  if (hasSeen) return null;
+  const hasSeen =
+    typeof window !== "undefined" &&
+    !!sessionStorage.getItem("scripttype-onboarding-seen");
+  if (hasSeen && step !== "complete") return null;
 
-  const isLast = step >= onboardingSteps.length - 1;
-  const complete = () => {
-    window.sessionStorage?.setItem?.(storageKey, "1");
-    setHasSeen(true);
+  const finish = () => {
+    sessionStorage.setItem("scripttype-onboarding-seen", "1");
+    setStep("complete");
+    window.dispatchEvent(
+      new CustomEvent("scripttype:onboarding-complete", { bubbles: true }),
+    );
   };
 
   return (
     <div
-      className="fixed inset-0 z-50 flex min-h-dvh items-center justify-center bg-background/90 px-5 backdrop-blur-sm"
+      className="fixed inset-0 z-[60] flex min-h-dvh items-center justify-center bg-background/90 px-5 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-label="Welcome to ScriptType"
     >
       <div className="mx-auto w-full max-w-[520px] rounded-panel border bg-card p-6 shadow-float sm:p-8">
-        <div className="text-center">
-          <span className="brand-mark mx-auto grid size-12 place-items-center rounded-full">
-            <BookOpenText size={20} aria-hidden="true" />
-          </span>
-          <h2 className="page-title mt-5 text-2xl font-semibold tracking-[-0.06em]">Welcome to ScriptType</h2>
-        </div>
+        {step === "welcome" && (
+          <>
+            <div className="text-center mb-8">
+              <BrandMark size="hero" className="mx-auto mb-3" />
+              <span className="sr-only">ScriptType</span>
+              <h2 className="page-title mt-5 text-2xl font-semibold tracking-[-0.06em]">
+                Welcome to ScriptType
+              </h2>
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                Build typing skill one focused verse at a time.
+              </p>
+            </div>
 
-        <div className="mt-8">
-          <h3 className="text-lg font-semibold mb-2">{onboardingSteps[step].title}</h3>
-          <p className="text-sm leading-6 text-muted-foreground">{onboardingSteps[step].description}</p>
-        </div>
+            <div className="surface-card p-5 text-center">
+              <Mascot size="xl" className="mx-auto mb-4 mascot-pop" />
+              <h3 className="text-base font-semibold">Try a verse before you join</h3>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Type today&rsquo;s passage now — no account required. Your first session unlocks your
+                personalized path.
+              </p>
+            </div>
 
-        <div className="mt-10 flex items-center justify-between gap-3">
-          <button
-            type="button"
-            onClick={() => setStep(Math.max(0, step - 1))}
-            disabled={step === 0}
-            className="inline-flex min-h-11 items-center gap-2 rounded-control border px-5 text-sm font-semibold disabled:opacity-40"
-          >
-            <ChevronLeft size={16} aria-hidden="true" /> Prev
-          </button>
-          {isLast ? (
-            <button type="button" onClick={complete} className="button-primary inline-flex min-h-11 items-center gap-2 px-6 text-sm">
-              Get started <ChevronRight size={16} aria-hidden="true" />
-            </button>
-          ) : (
-            <button type="button" onClick={() => setStep(step + 1)} className="button-primary inline-flex min-h-11 items-center gap-2 px-6 text-sm">
-              Next <ChevronRight size={16} aria-hidden="true" />
-            </button>
-          )}
-        </div>
+            <div className="mt-8 flex flex-col gap-3">
+              <Link
+                href="/practice"
+                className="button-primary inline-flex min-h-11 items-center justify-center gap-2 px-6 text-sm"
+              >
+                Type today&rsquo;s verse <ChevronRight size={14} aria-hidden="true" />
+              </Link>
+              <button
+                type="button"
+                onClick={() => setStep("personalize")}
+                disabled={!isSkippable}
+                className={`inline-flex min-h-11 items-center justify-center gap-2 px-6 text-xs font-semibold border rounded-full transition ${
+                  !isSkippable
+                    ? "border-white/20 bg-white/10 text-white/40 pointer-events-none"
+                    : "border-primary bg-primary text-primary-foreground hover:bg-primary/90"
+                }`}
+              >
+                <span>Join without trying</span>
+                <ChevronRight size={14} aria-hidden="true" />
+              </button>
+            </div>
 
-        <p className="mt-6 text-center text-[10px] text-muted-foreground">
-          Your progress stays on this device. Sign in with Firebase to sync across phones.
-        </p>
+            <p className="mt-6 text-center text-[10px] text-muted-foreground">
+              Progress stays on this device. Sign in with Firebase to sync across phones.
+            </p>
+          </>
+        )}
+
+        {step === "personalize" && (
+          <>
+            <div className="text-center mb-8">
+              <BrandMark size="lg" className="mx-auto mb-3" />
+              <h2 className="page-title mt-5 text-2xl font-semibold tracking-[-0.06em]">
+                Make ScriptType yours
+              </h2>
+            </div>
+
+            <div className="space-y-5">
+              <div>
+                <label className="text-[10px] font-semibold uppercase tracking-[0.13em] text-muted-foreground block mb-3">
+                  Weekly practice goal
+                </label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="range"
+                    min={1}
+                    max={14}
+                    value={weeklyGoal}
+                    onChange={(event) => setWeeklyGoal(Number(event.target.value))}
+                    className="h-2 flex-1 accent-primary focus-visible:ring-2 focus-visible:ring-ring"
+                  />
+                  <output className="grid size-10 place-items-center rounded-xl bg-primary/10 text-sm font-semibold text-primary">
+                    {weeklyGoal}
+                  </output>
+                </div>
+                <p className="mt-1 text-[10px] text-muted-foreground">
+                  Days per week — this never measures spiritual worth.
+                </p>
+              </div>
+
+              <div>
+                <label className="text-[10px] font-semibold uppercase tracking-[0.13em] text-muted-foreground block mb-3">
+                  Start with
+                </label>
+                <div className="grid gap-2 sm:grid-cols-3">
+                  {personalizationOptions.map((option) => (
+                    <button
+                      key={option.id}
+                      type="button"
+                      onClick={() => setJourneyPreference(option.id)}
+                      className={`flex flex-col items-center gap-2 rounded-control border px-3 py-4 text-sm font-medium transition ${
+                        journeyPreference === option.id
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-muted bg-card text-muted-foreground hover:border-primary/30 hover:bg-muted"
+                      }`}
+                    >
+                      <div className="grid size-9 place-items-center rounded-full bg-white/10">
+                        <Sparkles size={14} aria-hidden="true" />
+                      </div>
+                      <span className="text-[11px] leading-4">{option.label}</span>
+                      <span className="text-[9px] leading-3 text-muted-foreground">
+                        {option.description}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 flex items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => setStep("welcome")}
+                className="inline-flex min-h-10 items-center gap-2 rounded-full border px-4 text-xs font-semibold hover:bg-muted"
+              >
+                Back
+              </button>
+              <button
+                type="button"
+                onClick={() => setStep("consent")}
+                className="button-primary inline-flex min-h-10 items-center gap-2 px-5 text-xs font-semibold"
+              >
+                Next <ChevronRight size={14} aria-hidden="true" />
+              </button>
+            </div>
+          </>
+        )}
+
+        {step === "consent" && (
+          <>
+            <div className="text-center mb-8">
+              <BrandMark size="lg" className="mx-auto mb-3" />
+              <h2 className="page-title mt-5 text-2xl font-semibold tracking-[-0.06em]">
+                Your privacy choices
+              </h2>
+            </div>
+
+            <label className="mt-4 flex min-h-10 items-center gap-3 text-xs leading-5 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={consent}
+                onChange={(event) => setConsent(event.target.checked)}
+                className="mt-1 size-4 accent-primary focus-visible:ring-2 focus-visible:ring-ring"
+              />
+              <span>
+                <span className="block font-semibold">Save progress to a Firebase account</span>
+                <span className="mt-0.5 block text-muted-foreground">
+                  Optional. Your verses and reflections stay local unless you sign in.
+                </span>
+              </span>
+            </label>
+
+            <div className="mt-8 flex items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => setStep("personalize")}
+                className="inline-flex min-h-10 items-center gap-2 rounded-full border px-4 text-xs font-semibold hover:bg-muted"
+              >
+                Back
+              </button>
+              <button
+                type="button"
+                disabled={!consent}
+                onClick={finish}
+                className={`button-primary inline-flex min-h-10 items-center gap-2 px-5 text-xs font-semibold transition ${
+                  !consent
+                    ? "opacity-50 cursor-not-allowed"
+                    : "hover:bg-primary/90"
+                }`}
+              >
+                Finish setup
+              </button>
+            </div>
+          </>
+        )}
+
+        {step === "complete" && (
+          <>
+            <div className="text-center">
+              <div className="mx-auto mb-5">
+                <Mascot size="hero" animate className="mascot-pop" />
+              </div>
+              <h2 className="page-title text-2xl font-semibold tracking-[-0.06em]">
+                You&rsquo;re ready
+              </h2>
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                Your first practice session is saved. You can sign in anytime from Settings.
+              </p>
+            </div>
+            <div className="mt-8 flex items-center justify-center gap-3">
+              <Link
+                href="/today"
+                className="button-primary inline-flex min-h-11 items-center justify-center gap-2 px-6 text-sm"
+              >
+                Go to today
+              </Link>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

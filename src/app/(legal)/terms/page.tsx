@@ -1,13 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { BookOpenText } from "lucide-react";
+import { BrandMark } from "@/components/brand-mark";
 
 export default function TermsPage() {
   return (
     <main className="mx-auto max-w-[720px] px-5 py-12 sm:py-16">
       <Link href="/" className="mb-8 inline-flex items-center gap-3">
-        <span className="brand-mark"><BookOpenText size={17} aria-hidden="true" /></span>
+        <BrandMark size="sm" priority />
         <span className="text-sm font-semibold">ScriptType</span>
       </Link>
       <h1 className="page-title mt-4">Terms of use</h1>

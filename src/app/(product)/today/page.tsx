@@ -13,8 +13,10 @@ import {
   Target,
   Trophy,
 } from "lucide-react";
+import { BrandMark } from "@/components/brand-mark";
 import { useMemo } from "react";
 import { useAuth } from "@/components/app-providers";
+import { Mascot } from "@/components/mascot";
 import { journeys } from "@/data/journeys";
 import { getVerse } from "@/data/verses";
 import { useProgress } from "@/hooks/use-progress";
@@ -176,12 +178,72 @@ export default function TodayPage() {
   const timeMinutes = Math.round(
     todaySessions.reduce((total, session) => total + session.elapsedSeconds, 0) / 60,
   );
+  const isFirstRun = !loading && (progress?.sessions.length ?? 0) === 0;
+
+  if (isFirstRun) {
+    return (
+      <div className="float-in mx-auto max-w-[820px]">
+        <div className="mission-glow relative overflow-hidden rounded-panel p-6 text-white shadow-panel sm:p-10">
+          <div className="pointer-events-none absolute -right-16 -top-24 size-72 rounded-full border border-white/10" aria-hidden="true" />
+          <div className="relative text-center">
+            <Mascot size="xl" className="mx-auto mascot-pop" />
+            <p className="eyebrow mt-6 text-white/65">Your first mission</p>
+            <h1 className="mt-2 text-3xl font-semibold tracking-[-0.06em] sm:text-4xl">
+              One verse. One quiet moment.
+            </h1>
+            <p className="mx-auto mt-4 max-w-lg text-sm leading-6 text-white/70">
+              You don&rsquo;t need an account yet. Type one passage to set your baseline,
+              start a practice rhythm, and see how ScriptType feels.
+            </p>
+            <Link
+              href={`/practice?verse=${currentVerse?.id ?? "psalm-119-105"}`}
+              className="button-mission mx-auto mt-8 w-fit"
+            >
+              Type your first verse <ArrowRight size={15} aria-hidden="true" />
+            </Link>
+            <p className="mt-4 text-[11px] text-white/45">
+              About 2 minutes · your progress is saved on this device
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-3 sm:grid-cols-3">
+          {[
+            { icon: Keyboard, title: "Learn the keyboard", detail: "Guided finger placement" },
+            { icon: BookOpenText, title: "Keep it close", detail: "Memory and audio recall" },
+            { icon: Flame, title: "Build a rhythm", detail: "Gentle daily goals" },
+          ].map(({ icon: Icon, title, detail }) => (
+            <div key={title} className="surface-card flex items-center gap-3 p-4">
+              <span className="grid size-10 shrink-0 place-items-center rounded-control bg-accent text-primary">
+                <Icon size={17} aria-hidden="true" />
+              </span>
+              <div>
+                <p className="text-sm font-semibold">{title}</p>
+                <p className="text-[11px] text-muted-foreground">{detail}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-dashed p-4 text-xs text-muted-foreground">
+          <span>Prefer to explore first? Journeys and the keyboard trainer are open.</span>
+          <div className="flex gap-3">
+            <Link href="/journeys" className="font-semibold text-primary">Journeys</Link>
+            <Link href="/trainer" className="font-semibold text-primary">Trainer</Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="float-in mx-auto max-w-[1160px] space-y-5">
       <header className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="eyebrow">Your learning home</p>
+<div>
+            <div className="flex items-center gap-2">
+              <BrandMark size="xs" />
+              <p className="eyebrow">Your learning home</p>
+            </div>
           <h1 className="page-title mt-1.5">Good to see you, {displayName}.</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Build a skill. Keep the words that matter close.
