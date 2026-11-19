@@ -23,6 +23,7 @@ import { getRaceLeaderboard, type RaceEntry } from "@/lib/race-service";
 import { RaceTrack } from "@/components/race-track";
 import { useProgress } from "@/hooks/use-progress";
 import { useAuth } from "@/components/app-providers";
+import { Mascot } from "@/components/mascot";
 import {
   calculateMemoryMetrics,
   calculateTypingMetrics,
@@ -189,6 +190,7 @@ export function ChallengeRunner({
   const { user, firebaseConfigured, isOnline } = useAuth();
   const stageId = initialStage?.id;
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const [firstCompletion, setFirstCompletion] = useState(false);
 
   const stage = stageId
     ? typingStages.find((item) => item.id === stageId)
@@ -398,6 +400,11 @@ export function ChallengeRunner({
         (!("syncStatus" in saved) || saved.syncStatus === "synced");
       const savedMetrics =
         "metrics" in saved ? saved.metrics : saved;
+      const isFirstSession = (learnerProgress?.sessions.length ?? 0) === 0;
+      if (isFirstSession && !sessionStorage.getItem("scripttype-onboarding-seen")) {
+        sessionStorage.setItem("scripttype-show-onboarding-after-win", "1");
+      }
+      setFirstCompletion(isFirstSession);
       setCompletion({
         metrics: {
           wpm: savedMetrics.wpm,
@@ -460,8 +467,13 @@ export function ChallengeRunner({
             <div className="mt-10 flex size-14 items-center justify-center rounded-card bg-accent text-primary">
               <Sparkles size={25} aria-hidden="true" />
             </div>
+            {firstCompletion && (
+              <div className="mt-4">
+                <Mascot size="hero" animate className="mx-auto mascot-pop" />
+              </div>
+            )}
             <p className="mt-6 eyebrow text-white/70">
-              A moment well spent
+              {firstCompletion ? "Your first verse complete" : "A moment well spent"}
             </p>
             <h1 className="mt-2 text-3xl font-semibold tracking-[-0.06em] sm:text-4xl">
               {mode === "keyboard"

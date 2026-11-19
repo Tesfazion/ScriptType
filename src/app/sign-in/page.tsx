@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { BookOpenText, Check, CircleUserRound, Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
+import { Check, CircleUserRound, Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
 import { FormEvent, useState } from "react";
+import { BrandMark } from "@/components/brand-mark";
 import {
   createAccount,
   sendPasswordResetEmail,
@@ -25,6 +26,11 @@ export default function SignInPage() {
   const [showReset, setShowReset] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [resetSent, setResetSent] = useState(false);
+
+  function goGuest() {
+    localStorage.setItem("scripttype-device-mode", "1");
+    router.push("/today");
+  }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -76,7 +82,7 @@ export default function SignInPage() {
       <section className="mission-glow relative hidden overflow-hidden p-12 text-mission-foreground lg:flex lg:flex-col">
         <div className="absolute -right-24 top-20 size-80 rounded-full border border-white/10" />
         <Link href="/" className="relative flex items-center gap-3">
-          <span className="brand-mark"><BookOpenText size={17} aria-hidden="true" /></span>
+          <BrandMark size="sm" priority />
           <span className="text-sm font-semibold">ScriptType</span>
         </Link>
         <div className="relative my-auto max-w-[520px]">
@@ -86,12 +92,14 @@ export default function SignInPage() {
           </blockquote>
           <p className="mt-4 text-xs text-white/50">Psalm 119:105 · KJV</p>
           <div className="mt-10 grid grid-cols-3 gap-3">
-            {[["Daily", "mission"], ["Quiet", "progress"], ["Private", "reflection"]].map(([lead, tail]) => (
-              <div key={lead} className="rounded-2xl border border-white/10 bg-white/[0.05] p-4">
-                <div className="text-sm font-semibold">{lead}</div>
-                <div className="mt-1 text-[10px] text-white/45">{tail}</div>
-              </div>
-            ))}
+            {[["Daily", "mission"], ["Quiet", "progress"], ["Private", "reflection"]].map(
+              ([lead, tail]) => (
+                <div key={lead} className="rounded-2xl border border-white/10 bg-white/[0.05] p-4">
+                  <div className="text-sm font-semibold">{lead}</div>
+                  <div className="mt-1 text-[10px] text-white/45">{tail}</div>
+                </div>
+              ),
+            )}
           </div>
         </div>
         <p className="relative text-xs text-mission-muted">Scripture text: KJV · Rights review required before public audio/content launch.</p>
@@ -100,7 +108,7 @@ export default function SignInPage() {
       <section className="flex min-h-dvh items-center justify-center px-5 py-10 sm:px-10">
         <div className="w-full max-w-[420px]">
           <Link href="/" className="mb-10 flex items-center gap-3 lg:hidden">
-            <span className="brand-mark"><BookOpenText size={17} aria-hidden="true" /></span>
+            <BrandMark size="sm" />
             <span className="text-sm font-semibold">ScriptType</span>
           </Link>
           {user ? (
@@ -173,7 +181,16 @@ export default function SignInPage() {
                 </button>
               </form>
 
-              <p className="mt-5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              <div className="mt-6 border-t pt-5">
+                <button type="button" onClick={goGuest} className="w-full inline-flex min-h-11 items-center justify-center gap-2 rounded-full border px-5 text-xs font-semibold hover:bg-muted">
+                  Continue without an account
+                </button>
+                <p className="mt-3 text-[10px] text-muted-foreground">
+                  Your progress stays on this device. Sign in later to sync across phones.
+                </p>
+              </div>
+
+              <p className="mt-6 text-xs font-medium uppercase tracking-wide text-muted-foreground">
                 By continuing, you agree to ScriptType&apos;s <Link href="/terms" className="underline hover:text-foreground">terms</Link> and <Link href="/privacy" className="underline hover:text-foreground">privacy choices</Link>.
               </p>
 

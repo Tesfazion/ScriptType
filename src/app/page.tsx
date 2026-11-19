@@ -7,8 +7,12 @@ import {
   Check,
   Flame,
   Keyboard,
+  Sparkles,
+  UsersRound,
 } from "lucide-react";
 import { LandingPreview } from "@/components/landing-preview";
+import { BrandMark } from "@/components/brand-mark";
+import { Mascot } from "@/components/mascot";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const practiceSteps = [
@@ -53,6 +57,24 @@ const journeys = [
   },
 ];
 
+const proofPoints = [
+  {
+    icon: Sparkles,
+    label: "Try before you join",
+    detail: "Type a full verse without creating an account.",
+  },
+  {
+    icon: Check,
+    label: "No streak guilt",
+    detail: "Progress recognizes practice, not spiritual worth.",
+  },
+  {
+    icon: UsersRound,
+    label: "Private by default",
+    detail: "Reflections stay on your device unless you choose to sync.",
+  },
+];
+
 export default function Home() {
   return (
     <div className="min-h-dvh bg-background text-foreground">
@@ -67,15 +89,11 @@ export default function Home() {
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-5 px-4 sm:px-7 lg:px-10">
           <Link
             href="/"
-            className="flex items-center gap-3"
+            className="brand-wordmark"
             aria-label="ScriptType home"
           >
-            <span className="brand-mark" aria-hidden="true">
-              <BookOpenText size={17} strokeWidth={2} />
-            </span>
-            <span className="text-base font-semibold tracking-tight">
-              ScriptType
-            </span>
+            <BrandMark size="sm" priority />
+            <span className="brand-name">ScriptType</span>
           </Link>
 
           <nav
@@ -98,8 +116,8 @@ export default function Home() {
             <Link href="/sign-in" className="button-quiet hidden sm:inline-flex">
               Sign in
             </Link>
-            <Link href="/today" className="button-primary min-h-10 px-4 text-xs">
-              Get started
+            <Link href="/practice" className="button-primary min-h-10 px-4 text-xs">
+              Try a verse
               <ArrowUpRight size={14} aria-hidden="true" />
             </Link>
           </div>
@@ -118,6 +136,13 @@ export default function Home() {
                 <span className="size-2 rounded-full bg-primary" />
                 A little practice for a deeper rhythm
               </div>
+              <div className="mt-6 flex items-center gap-4">
+                <Mascot size="md" className="shrink-0" />
+                <p className="max-w-xs text-sm leading-6 text-muted-foreground">
+                  Meet your practice companion — the ScriptType ribbon that
+                  remembers what you type.
+                </p>
+              </div>
               <h1 className="mt-5 max-w-[11ch] text-display font-semibold tracking-[-0.065em]">
                 Let the Word
                 <span className="mt-1 block text-primary">take root.</span>
@@ -128,16 +153,16 @@ export default function Home() {
               </p>
               <div className="mt-8 flex flex-wrap items-center gap-3">
                 <Link href="/practice" className="button-primary min-h-12 px-6">
-                  Try a verse
+                  Type today&rsquo;s verse
                   <ArrowRight size={16} aria-hidden="true" />
                 </Link>
-                <a href="#practice" className="button-secondary min-h-12 px-5">
-                  Explore the practice
+                <a href="#journeys" className="button-secondary min-h-12 px-5">
+                  Explore journeys
                   <ArrowDown size={15} aria-hidden="true" />
                 </a>
               </div>
               <p className="mt-5 text-xs text-muted-foreground">
-                Start in your browser. No account needed for the sample.
+                No account needed. Your first practice is saved on this device.
               </p>
             </div>
 
@@ -151,9 +176,25 @@ export default function Home() {
           </div>
         </section>
 
+        <section className="border-y bg-card py-10" aria-label="What makes ScriptType different">
+          <div className="mx-auto grid max-w-7xl gap-5 px-4 sm:px-7 md:grid-cols-3 lg:px-10">
+            {proofPoints.map(({ icon: Icon, label, detail }) => (
+              <div key={label} className="flex items-start gap-3">
+                <span className="grid size-9 shrink-0 place-items-center rounded-control bg-accent text-primary">
+                  <Icon size={16} aria-hidden="true" />
+                </span>
+                <div>
+                  <p className="text-sm font-semibold">{label}</p>
+                  <p className="mt-0.5 text-xs leading-5 text-muted-foreground">{detail}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
         <section
           id="practice"
-          className="border-y bg-card py-16 sm:py-20"
+          className="border-b bg-card py-16 sm:py-20"
           aria-labelledby="practice-heading"
         >
           <div className="mx-auto max-w-7xl px-4 sm:px-7 lg:px-10">
@@ -262,10 +303,10 @@ export default function Home() {
               </p>
             </div>
             <Link
-              href="/today"
+              href="/practice"
               className="inline-flex min-h-12 w-fit items-center gap-2 rounded-control bg-white px-5 text-sm font-semibold text-slate-900 transition hover:bg-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
-              Find today&apos;s mission
+              Type today&rsquo;s verse
               <ArrowUpRight size={16} aria-hidden="true" />
             </Link>
           </div>
@@ -274,15 +315,16 @@ export default function Home() {
 
       <footer className="border-t bg-card">
         <div className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-6 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-7 lg:px-10">
-          <Link href="/" className="flex items-center gap-3">
-            <span className="brand-mark size-8" aria-hidden="true">
-              <BookOpenText size={16} />
-            </span>
+          <Link href="/" className="brand-wordmark">
+            <BrandMark size="xs" />
             <span>ScriptType · A little practice for a deeper rhythm.</span>
           </Link>
           <div className="flex flex-wrap items-center gap-5">
-            <Link href="/settings" className="nav-link">
+            <Link href="/privacy" className="nav-link">
               Privacy
+            </Link>
+            <Link href="/terms" className="nav-link">
+              Terms
             </Link>
             <Link href="/sign-in" className="nav-link">
               Your account

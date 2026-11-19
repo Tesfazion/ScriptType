@@ -68,7 +68,7 @@ export function LandingPreview() {
             href="/practice"
             className="button-mission mt-auto w-fit"
           >
-            {complete ? "Continue" : "Enter a challenge"}
+            {complete ? "Continue" : "Type today's verse"}
             <ArrowUpRight size={15} aria-hidden="true" />
           </Link>
         </div>

@@ -1,27 +1,57 @@
 {
-  "id": "/",
   "name": "ScriptType",
   "short_name": "ScriptType",
-  "description": "Build typing skill and practice the words that matter.",
-  "start_url": "/today",
+  "description": "Learn touch typing step by step, improve your speed, and keep the words that matter close.",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#f8fafc",
+  "background_color": "#0b1226",
   "theme_color": "#4f46e5",
-  "categories": ["education", "productivity"],
   "icons": [
+    { "src": "/scripttype-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/scripttype-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/scripttype-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/scripttype-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "screenshots": [
     {
-      "src": "/scripttype-icon-192.png",
-      "sizes": "192x192",
+      "src": "/screenshot-wide.png",
+      "sizes": "1280x720",
       "type": "image/png",
-      "purpose": "any"
+      "form_factor": "wide",
+      "label": "ScriptType daily mission view"
     },
     {
-      "src": "/scripttype-icon-512.png",
-      "sizes": "512x512",
+      "src": "/screenshot-narrow.png",
+      "sizes": "390x844",
       "type": "image/png",
-      "purpose": "any maskable"
+      "form_factor": "narrow",
+      "label": "ScriptType mobile practice view"
+    }
+  ],
+  "categories": ["education", "productivity", "religion"],
+  "shortcuts": [
+    {
+      "name": "Today's practice",
+      "short_name": "Today",
+      "description": "Open today's mission and continue your lesson.",
+      "url": "/today",
+      "icons": [{ "src": "/scripttype-icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Practice a verse",
+      "short_name": "Practice",
+      "description": "Type today's verse at your own pace.",
+      "url": "/practice",
+      "icons": [{ "src": "/scripttype-icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Learn the keyboard",
+      "short_name": "Trainer",
+      "description": "Open the guided keyboard trainer.",
+      "url": "/trainer",
+      "icons": [{ "src": "/scripttype-icon-192.png", "sizes": "192x192" }]
     }
   ]
 }

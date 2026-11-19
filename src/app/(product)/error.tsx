@@ -1,7 +1,7 @@
 "use client";
 
-import { BookOpenText } from "lucide-react";
 import Link from "next/link";
+import { Mascot } from "@/components/mascot";
 
 export default function ErrorBoundary({
   error,
@@ -14,8 +14,10 @@ export default function ErrorBoundary({
 
   return (
     <main className="mx-auto max-w-[720px] px-5 py-16 sm:py-24 text-center">
-      <BookOpenText size={48} className="mx-auto mb-6 text-muted-foreground" aria-hidden="true" />
-      <h1 className="page-title text-3xl sm:text-4xl font-semibold tracking-[-0.06em] mb-4">Something went wrong</h1>
+      <Mascot size="lg" animate className="mx-auto mb-6" />
+      <h1 className="page-title text-3xl sm:text-4xl font-semibold tracking-[-0.06em] mb-4">
+        Something went wrong
+      </h1>
       <p className="mb-6 text-lg text-muted-foreground">
         We ran into an unexpected problem. The team has been notified.
       </p>
