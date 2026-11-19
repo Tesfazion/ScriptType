@@ -4,7 +4,7 @@ Build typing confidence, one focused session at a time.
 
 A guided keyboard curriculum meets Scripture practice, memory, and meaningful daily progress.
 
-[Quick Start](#quick-start) · [Experience](#experience) · [Install & Offline](#install-and-offline-use) · [Docs](#documentation)
+[Quick Start](#quick-start) · [Experience](#experience) · [Install & Offline](#install-and-offline-use) · [Documentation](#documentation) · [Recent Changes](#recent-changes)
 
 ---
 
@@ -12,7 +12,19 @@ A guided keyboard curriculum meets Scripture practice, memory, and meaningful da
 
 ScriptType is a typing practice application that turns keyboard skill-building into a clear, rewarding learning path. Practice typing with live character feedback, follow a 15-lesson beginner curriculum, and keep Scripture memory, audio recall, and reflection as meaningful parts of your journey.
 
-The app is a Next.js (App Router) web app that works as a Progressive Web App (PWA), so users can install it on phones and desktops — the ScriptType logo appears as the app icon on your home screen or desktop shortcut.
+The app is a Next.js (App Router) web application that works as a Progressive Web App (PWA), so users can install it on phones and desktops — the ScriptType ribbon "S" brand mark appears as the app icon on your home screen or desktop shortcut.
+
+---
+
+## Recent Changes
+
+- **Brand mascot & 3D animation**: The ScriptType ribbon "S" mascot now animates with a gentle 3D tilt effect on welcome screens and first-win celebrations.
+- **First-run onboarding**: New skippable welcome flow with weekly goal, journey preference, and privacy choices. Completing first practice triggers an optional personalization step.
+- **Sign-in resilience**: When Firebase is not configured, ScriptType still runs in device demo mode — progress stays on the device, with a clear "Continue without an account" path.
+- **Dashboard restructure**: Today page background image moved into a mission-glow header; clearer visual hierarchy for missions, Scripture journey, and skill summary.
+- **Mobile-first trainer**: Hand/finger illustrations hidden on small screens; mobile practice is speed-focused without left/right hand layout.
+- **CTA fixes**: "Type today's verse" and "Go to today" buttons navigate reliably across landing, dashboard, and onboarding.
+- **PWA assets**: Favicons, Apple touch icons, splash screens, OG image, and PWA screenshots generated from the source logo via Sharp.
 
 ---
 
@@ -30,19 +42,22 @@ The app is a Next.js (App Router) web app that works as a Progressive Web App (P
 - **Personal milestones** — badges celebrate lessons, accuracy, speed, and consistency.
 - **Thoughtful hybrid** — typing is the core curriculum; Scripture journeys, recall, and reflection are first-class experiences.
 - **Visual coaching** — the trainer highlights target keys, finger zones, and home-row placement.
-- **Everyday ready** — responsive layouts, keyboard-friendly controls, light/dark themes, and optional sound feedback.
-- **Installable and resilient** — PWA install manifest, offline navigation fallback, cached app pages, and a bounded local practice outbox.
+- **Mobile-first** — small-screen practice omits left/right hand layout; speed-focused experience.
+- **3D mascot branding** — ribbon "S" mascot with gentle idle and welcome animations.
+- **Everyday ready** — responsive layouts, keyboard-friendly controls, light/dark themes, optional sound feedback.
+- **Installable and resilient** — PWA install manifest, offline navigation fallback, cached app pages, bounded local practice outbox.
 
 ---
 
 ## App Icon (PWA)
 
-The ScriptType logo (`src/app/ScrptType logo.png`) is the app icon used when the app is installed on a phone or desktop:
+The ScriptType logo (`src/app/ScriptType logo.png`) is the app icon used when the app is installed on a phone or desktop:
 
 - `public/scripttype-icon-192.png` — 192×192 icon (manifest + Apple touch icon)
 - `public/scripttype-icon-512.png` — 512×512 maskable icon
 - `public/manifest.json` — PWA manifest referencing both icons
 - `src/app/layout.tsx` — icon metadata for browsers and install prompts
+- `scripts/generate-icons.mjs` — regenerates favicons, splash screens, OG image, and PWA screenshots from the source logo using Sharp
 
 Install via **Install ScriptType** in the app navigation, or your browser's Add to Home Screen / Install option.
 
@@ -163,6 +178,7 @@ functions/             Server-side Firebase Cloud Functions
 tests/                 Focused automated tests
 docs/                  Product, design, architecture, and setup guides
 public/                Static assets: manifest, icons, service worker
+scripts/               Build-time asset generation
 ```
 
 ---

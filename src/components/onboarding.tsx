@@ -1,17 +1,19 @@
 "use client";
 
-import Link from "next/link";
 import { ChevronRight, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import { BrandMark } from "@/components/brand-mark";
 import { Mascot } from "@/components/mascot";
+import { useRouter } from "next/navigation";
 
 type OnboardingStep =
   | "welcome"
-  | "try-first"
   | "personalize"
   | "consent"
   | "complete";
+
+const ONBOARDING_SEEN_KEY = "scripttype-onboarding-seen";
+const ONBOARDING_AFTER_WIN_KEY = "scripttype-show-onboarding-after-win";
 
 const personalizationOptions = [
   {
@@ -31,10 +33,16 @@ const personalizationOptions = [
   },
 ] as const;
 
+function dismissOnboarding() {
+  sessionStorage.setItem(ONBOARDING_SEEN_KEY, "1");
+  sessionStorage.removeItem(ONBOARDING_AFTER_WIN_KEY);
+}
+
 export function Onboarding() {
+  const router = useRouter();
   const [step, setStep] = useState<OnboardingStep>(() => {
     if (typeof window === "undefined") return "welcome";
-    return sessionStorage.getItem("scripttype-show-onboarding-after-win") === "1"
+    return sessionStorage.getItem(ONBOARDING_AFTER_WIN_KEY) === "1"
       ? "personalize"
       : "welcome";
   });
@@ -44,18 +52,17 @@ export function Onboarding() {
   const [consent, setConsent] = useState(false);
 
   useEffect(() => {
-    // Allow skip after 3 seconds so the user has read the welcome.
     const timer = setTimeout(() => setIsSkippable(true), 3000);
     return () => clearTimeout(timer);
   }, []);
 
   const hasSeen =
     typeof window !== "undefined" &&
-    !!sessionStorage.getItem("scripttype-onboarding-seen");
+    !!sessionStorage.getItem(ONBOARDING_SEEN_KEY);
   if (hasSeen && step !== "complete") return null;
 
   const finish = () => {
-    sessionStorage.setItem("scripttype-onboarding-seen", "1");
+    dismissOnboarding();
     setStep("complete");
     window.dispatchEvent(
       new CustomEvent("scripttype:onboarding-complete", { bubbles: true }),
@@ -73,9 +80,10 @@ export function Onboarding() {
         {step === "welcome" && (
           <>
             <div className="text-center mb-8">
-              <BrandMark size="hero" className="mx-auto mb-3" />
-              <span className="sr-only">ScriptType</span>
-              <h2 className="page-title mt-5 text-2xl font-semibold tracking-[-0.06em]">
+              <div className="mx-auto mb-5 w-fit">
+                <Mascot size="hero" animate className="mascot-hero-3d" />
+              </div>
+              <h2 className="page-title text-2xl font-semibold tracking-[-0.06em]">
                 Welcome to ScriptType
               </h2>
               <p className="mt-3 text-sm leading-6 text-muted-foreground">
@@ -84,21 +92,23 @@ export function Onboarding() {
             </div>
 
             <div className="surface-card p-5 text-center">
-              <Mascot size="xl" className="mx-auto mb-4 mascot-pop" />
               <h3 className="text-base font-semibold">Try a verse before you join</h3>
               <p className="mt-2 text-xs text-muted-foreground">
-                Type today&rsquo;s passage now — no account required. Your first session unlocks your
-                personalized path.
+                Type today&rsquo;s passage now — no account required. Your first session unlocks your personalized path.
               </p>
             </div>
 
             <div className="mt-8 flex flex-col gap-3">
-              <Link
-                href="/practice"
+              <button
+                type="button"
+                onClick={() => {
+                  dismissOnboarding();
+                  router.push("/practice");
+                }}
                 className="button-primary inline-flex min-h-11 items-center justify-center gap-2 px-6 text-sm"
               >
                 Type today&rsquo;s verse <ChevronRight size={14} aria-hidden="true" />
-              </Link>
+              </button>
               <button
                 type="button"
                 onClick={() => setStep("personalize")}
@@ -251,8 +261,8 @@ export function Onboarding() {
         {step === "complete" && (
           <>
             <div className="text-center">
-              <div className="mx-auto mb-5">
-                <Mascot size="hero" animate className="mascot-pop" />
+              <div className="mx-auto mb-5 w-fit">
+                <Mascot size="hero" animate className="mascot-hero-3d" />
               </div>
               <h2 className="page-title text-2xl font-semibold tracking-[-0.06em]">
                 You&rsquo;re ready
@@ -262,12 +272,16 @@ export function Onboarding() {
               </p>
             </div>
             <div className="mt-8 flex items-center justify-center gap-3">
-              <Link
-                href="/today"
+              <button
+                type="button"
+                onClick={() => {
+                  dismissOnboarding();
+                  router.push("/today");
+                }}
                 className="button-primary inline-flex min-h-11 items-center justify-center gap-2 px-6 text-sm"
               >
-                Go to today
-              </Link>
+                Go to today <ChevronRight size={14} aria-hidden="true" />
+              </button>
             </div>
           </>
         )}

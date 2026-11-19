@@ -84,7 +84,7 @@ export function KeyboardCoach({
 
   return (
     <aside
-      className="surface-muted mt-5 overflow-hidden p-4 sm:p-5"
+      className="surface-muted mt-5 overflow-hidden rounded-panel p-4 sm:p-5"
       aria-label="Keyboard and hand guidance"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -105,7 +105,7 @@ export function KeyboardCoach({
       <div className="mt-4 overflow-x-auto pb-2" tabIndex={0} aria-label="Keyboard diagram; scroll horizontally to view all keys">
         <div className="min-w-[30rem] space-y-1.5" role="img" aria-label={`QWERTY keyboard with ${guidance.key} highlighted`}>
           {KEY_ROWS.map((row) => (
-            <div key={row.keys.join("")} className={`flex gap-1 ${row.className}`}>
+            <div key={row.keys.join(" ")} className={`flex gap-1 ${row.className}`}>
               {row.keys.map((key) => (
                 <kbd
                   key={key}
@@ -138,7 +138,7 @@ export function KeyboardCoach({
         </div>
       </div>
 
-      <div className="mt-3 grid grid-cols-2 gap-4 border-t pt-3">
+      <div className="mt-3 grid grid-cols-2 gap-4 border-t pt-3 hidden sm:block">
         <HandGuide hand="left" activeFinger={guidance.finger} />
         <HandGuide hand="right" activeFinger={guidance.finger} />
       </div>

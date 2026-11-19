@@ -87,8 +87,8 @@ export default function SignInPage() {
         </Link>
         <div className="relative my-auto max-w-[520px]">
           <p className="eyebrow text-mission-muted">Make a little room</p>
-          <blockquote className="reading-type mt-5 text-4xl leading-[1.35] tracking-[-0.03em]">
-            “Thy word is a lamp unto my feet, and a light unto my path.”
+<blockquote className="reading-type mt-5 text-4xl leading-[1.35] tracking-[-0.03em]">
+            &ldquo;Thy word is a lamp unto my feet, and a light unto my path.&rdquo;
           </blockquote>
           <p className="mt-4 text-xs text-white/50">Psalm 119:105 · KJV</p>
           <div className="mt-10 grid grid-cols-3 gap-3">
@@ -137,19 +137,37 @@ export default function SignInPage() {
               </div>
 
               {!firebaseConfigured && (
-                <div className="mt-6 flex items-start gap-2.5 rounded-control border border-primary/20 bg-accent p-3 text-sm leading-5 text-accent-foreground">
-                  <LockKeyhole size={15} className="mt-0.5 shrink-0" aria-hidden="true" />
-                  Firebase is not configured. Add the NEXT_PUBLIC_FIREBASE_* values to enable account sign-in.
+                <div className="mt-4 rounded-control bg-muted/30 p-4 text-sm leading-5 text-muted-foreground">
+                  <div className="flex items-center gap-2.5">
+                    <LockKeyhole size={15} className="shrink-0" aria-hidden="true" />
+                    <span className="font-medium">Firebase is not configured.</span>
+                  </div>
+                  <p className="mt-2 ml-[23px] text-xs">
+                    Account sign-in is temporarily unavailable. You can still use ScriptType locally — progress stays on this device.
+                  </p>
                 </div>
               )}
 
-              <button type="button" onClick={googleSignIn} disabled={!firebaseConfigured || submitting} className="button-secondary mt-7 w-full disabled:cursor-not-allowed disabled:opacity-50">
-                <CircleUserRound size={17} aria-hidden="true" /> Continue with Google
+              <button
+                type="button"
+                onClick={goGuest}
+                className="button-primary mt-6 w-full min-h-11 text-sm font-semibold"
+                disabled={!firebaseConfigured && !user}
+              >
+                Continue without an account
               </button>
 
-              <div className="my-6 flex items-center gap-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                <span className="h-px flex-1 bg-border" /> or use email <span className="h-px flex-1 bg-border" />
-              </div>
+              {firebaseConfigured && (
+                <>
+                  <button type="button" onClick={googleSignIn} disabled={submitting} className="button-secondary mt-4 w-full disabled:cursor-not-allowed disabled:opacity-50">
+                    <CircleUserRound size={17} aria-hidden="true" /> Continue with Google
+                  </button>
+
+                  <div className="my-6 flex items-center gap-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    <span className="h-px flex-1 bg-border" /> or use email <span className="h-px flex-1 bg-border" />
+                  </div>
+                </>
+              )}
 
               <form onSubmit={submit} className="space-y-4">
                 {mode === "create" && (
@@ -182,10 +200,7 @@ export default function SignInPage() {
               </form>
 
               <div className="mt-6 border-t pt-5">
-                <button type="button" onClick={goGuest} className="w-full inline-flex min-h-11 items-center justify-center gap-2 rounded-full border px-5 text-xs font-semibold hover:bg-muted">
-                  Continue without an account
-                </button>
-                <p className="mt-3 text-[10px] text-muted-foreground">
+                <p className="text-[10px] text-muted-foreground">
                   Your progress stays on this device. Sign in later to sync across phones.
                 </p>
               </div>

@@ -56,6 +56,8 @@ export function ProductShell({ children }: { children: React.ReactNode }) {
     const id = setTimeout(() => setMounted(true), 0);
     return () => clearTimeout(id);
   }, []);
+
+  // Monitor sessionStorage for onboarding after first win and custom completion event
   const isActive = (href: string) =>
     pathname === href || (href !== "/today" && pathname.startsWith(`${href}/`));
 
