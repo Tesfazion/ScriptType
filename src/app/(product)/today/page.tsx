@@ -255,7 +255,9 @@ return (
               </p>
             </div>
             <div className="flex flex-col items-center gap-3 sm:flex-row">
-              <Mascot size="hero" animate className="mascot-hero-3d" />
+              <div className="mascot-enter-from-corner">
+                <Mascot size="hero" animate className="mascot-hero-3d" />
+              </div>
               <Link href="/profile" className="button-secondary min-h-10 px-3 text-xs opacity-90 hover:opacity-100">
                 <span className="grid size-7 place-items-center rounded-full bg-primary/10 font-semibold text-primary">
                   {displayName.slice(0, 1).toLocaleUpperCase()}
