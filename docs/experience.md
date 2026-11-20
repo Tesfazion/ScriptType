@@ -6,7 +6,7 @@
 flowchart TD
   A[Landing / deep link] --> B{Signed in?}
   B -- No --> C[Try sample or create account]
-  C --> D[Set timezone, weekly goal, privacy choices]
+  C --> D[Optional setup: weekly goal and local/sync choice]
   D --> E[Today's mission]
   B -- Yes --> E
   E --> F[Choose continue journey or recommended verse]
@@ -21,7 +21,7 @@ flowchart TD
 
 ### Keyboard learning loop
 
-`/today` summarizes skill level, XP, WPM, accuracy, streak, current curriculum step, daily goals, and recent learning activity. The primary action continues the current lesson. `/journeys` exposes the 15 sequential keyboard lessons alongside Scripture journeys. `/trainer` provides guided keyboard and finger coaching; a keyboard lesson unlocks its successor only after its accuracy threshold is met. Practice modes include speed and accuracy criteria plus a daily race.
+`/today` summarizes skill level, XP, WPM, accuracy, streak, current curriculum step, daily goals, and recent learning activity. The primary action continues the current lesson. `/journeys` presents 15 sequential keyboard lessons followed by available Scripture journeys. `/trainer` provides guided keyboard and finger coaching; keyboard lessons unlock sequentially. Practice modes include speed and accuracy criteria plus a daily race.
 
 ## Supporting flows
 
@@ -34,8 +34,11 @@ Select a verse → choose visible / missing words / major words hidden / fully h
 ### Community
 Create/join by invite → preview group name, owner, rules, and visible profile fields → accept → choose alias/leaderboard visibility → join an opt-in challenge → report/block if needed. No private journal or full practice text appears in group feeds.
 
-### Admin publishing
-Authorized staff → create draft → set translation/provenance and ordered references → validate content and rights metadata → preview desktop/mobile → publish version → audit log. Archive does not erase user completion history.
+### AI assistant
+Open **Ask** from a product page → review the AI data-use notice → optionally consent → ask about Scripture or typing → receive an answer with a reminder that AI can be wrong. The current context sent is a section label only; journals, account details, and progress are not attached. Conversation stays in component memory and is not saved by ScriptType.
+
+### Admin publishing (planned; not in this build)
+The repository has no admin route or publishing interface. A future authorized staff flow should create drafts, attach translation/provenance and rights metadata, validate and preview content, publish versioned content, and record an audit log. Do not treat this design as an available feature.
 
 ## Page-by-page breakdown
 
@@ -45,20 +48,23 @@ Authorized staff → create draft → set translation/provenance and ordered ref
 | `/sign-in` | Establish identity | Email/password, Google, error recovery, privacy links; guest demo path |
 | `/onboarding` | Personalize habit | Weekly goal, preferred reminder/timezone, optional journey, privacy and consent |
 | `/today` | Start today's action | Compact typing and Scripture progress, continue lesson, daily goals, weekly rhythm, recent achievements, typing analytics |
-| `/app/challenge/[id]` | Focused practice | Verse/reference, mode controls, typed text, caret/progress, timer/WPM/accuracy, pause/exit |
-| `/app/complete/[sessionId]` | Reflect and reward | Metrics, XP/milestone motion, optional reflection, next-step CTA |
-| `/app/journeys` | Choose a structured path | Journey map/list, progress, duration, translation and next step |
-| `/app/journeys/[id]` | Continue a path | Chapter/verse steps, completion states, resume action |
-| `/app/memory` | Recall and review | Level progression, due reviews, recall history |
-| `/app/audio` | Listen and type | Playback, replay/speed, transcript access, listening/typing score |
+| `/practice` | Focused practice | Verse/reference, mode controls, typed text, caret/progress, timer/WPM/accuracy, completion feedback |
+| `/journeys` | Choose a structured path | Keyboard curriculum and Scripture journey previews, progress and next step |
+| `/journeys/[id]` | Continue a path | Three sample-passage steps, completion states, resume action |
+| `/memory` | Recall and review | Memory practice levels and recall feedback |
+| `/audio` | Listen and type | Audio practice and typing score, subject to configured content |
 | `/progress` | See growth | WPM/accuracy trends, activity calendar, chapters, memory, goals |
-| `/community` | Race with consent | Opt-in daily global alias leaderboard or results for an existing invited group |
+| `/community` | Race with consent | Daily leaderboard preview and privacy guardrails; group features are not open in this build |
 | `/trainer` | Learn keyboard mechanics | Guided key/finger/hand placement with a visual keyboard and hand model |
-| `/app/community/groups/[id]` | Coordinate a group | Challenge status, member visibility choices, group rules, moderator/report |
-| `/app/reflection` | Private practice journal | User-controlled prompts, saved entries, export/delete controls |
-| `/app/settings` | Manage account | Profile/timezone, notifications, privacy, accessibility, subscription, export/delete |
-| `/app/profile` | View identity and practice history | Level/rank, XP, WPM, accuracy, streak, recent lessons, account/device state |
-| `/app/admin` | Curate product content | Role-protected drafts, journeys, daily verses, achievement/challenge CRUD, user safety queues, audit view |
+| `/reflection` | Private practice journal | Optional prompts and locally saved entries; explicit AI requests have a separate disclosure |
+| `/settings` | Manage preferences | Weekly goal, sound, race identity/visibility, local data export/delete |
+| `/profile` | View identity and practice history | Level/rank, XP, WPM, accuracy, streak, recent lessons, account/device state |
+| `/sign-in` | Establish identity or continue locally | Email/password, Google when configured, recovery, guest/device-only path |
+| `/privacy`, `/terms` | Review policies | Data handling and terms |
+| `/offline` | Recover while offline | Offline status and return path |
+| `/admin` | Not implemented | No admin route exists; content publishing and staff controls remain a product gap |
+
+Routes above describe the current App Router paths. Older `/app/...` paths in earlier design notes were aspirational and are not implemented routes.
 
 ## Mobile-first wireframes
 

@@ -3,7 +3,11 @@
 import { Check, Download, ShieldCheck, Trash2, Volume2 } from "lucide-react";
 import { FormEvent, useEffect, useState } from "react";
 import { useAuth } from "@/components/app-providers";
-import { setLocalWeeklyGoal, readLocalProgress } from "@/lib/local-progress";
+import {
+  MAX_WEEKLY_GOAL,
+  setLocalWeeklyGoal,
+  readLocalProgress,
+} from "@/lib/local-progress";
 import { readRaceSettings, updateRaceSettings } from "@/lib/race-service";
 import { saveAccountPreference, syncAccountPreferences } from "@/lib/account-preferences";
 
@@ -209,11 +213,11 @@ export default function SettingsPage() {
         <p className="mt-1 text-xs leading-5 text-muted-foreground">Choose a rhythm that feels sustainable. This never measures spiritual worth.</p>
         <form onSubmit={saveGoal} className="mt-5">
           <label htmlFor="weekly-goal" className="text-[10px] font-semibold uppercase tracking-[0.13em] text-muted-foreground">
-            Practice days per week
+            Practice days per week (up to 7)
           </label>
           <div className="mt-2 flex items-center gap-3">
-            <input id="weekly-goal" type="range" min={1} max={14} value={goal} onChange={(event) => setGoal(Number(event.target.value))} className="h-2 flex-1 accent-primary focus-visible:ring-2 focus-visible:ring-ring" />
-            <output className="grid size-12 place-items-center rounded-xl bg-primary/10 text-sm font-semibold text-primary">{goal}</output>
+            <input id="weekly-goal" type="range" min={1} max={MAX_WEEKLY_GOAL} value={goal} aria-valuetext={`${goal} ${goal === 1 ? "day" : "days"} per week`} onChange={(event) => setGoal(Number(event.target.value))} className="h-2 flex-1 accent-primary focus-visible:ring-2 focus-visible:ring-ring" />
+            <output htmlFor="weekly-goal" className="grid size-12 place-items-center rounded-xl bg-primary/10 text-sm font-semibold text-primary">{goal}</output>
           </div>
           <button type="submit" className="mt-4 inline-flex min-h-10 items-center gap-2 rounded-full bg-primary px-4 text-xs font-semibold text-primary-foreground">
             <Check size={13} aria-hidden="true" /> Save goal

@@ -48,7 +48,7 @@ export default function JourneysPage() {
               <p className="mt-2 max-w-xl text-sm leading-6 text-white/65">
                 {nextStage
                   ? `Next up: Stage ${nextStage.number} — ${nextStage.title}`
-                  : "All 13 stages complete. Keep practicing to stay sharp."}
+                  : `All ${typingStages.length} stages complete. Keep practicing to stay sharp.`}
               </p>
             </div>
             <div className="rounded-card border border-white/15 bg-white/10 px-4 py-3 text-right">

@@ -19,6 +19,7 @@ import {
   isTypingStageUnlocked,
 } from "../shared/typing-progress";
 import { resolvePreference } from "../shared/account-preferences";
+import { normalizeWeeklyGoal } from "../src/lib/local-progress";
 
 describe("typing metrics", () => {
   it("calculates WPM, accuracy, elapsed time, and mistakes", () => {
@@ -46,6 +47,12 @@ describe("memory scoring", () => {
 });
 
 describe("progression", () => {
+  it("limits legacy weekly goals to the seven days available in a week", () => {
+    expect(normalizeWeeklyGoal(7)).toBe(7);
+    expect(normalizeWeeklyGoal(14)).toBe(7);
+    expect(() => normalizeWeeklyGoal(0)).toThrow();
+  });
+
   it("resolves level thresholds and rank milestones", () => {
     expect(getLevelProgress(400)).toMatchObject({ level: 3, rank: "Seeker", progressPercent: 0 });
     expect(getLevelProgress(2_500).rank).toBe("Disciple");

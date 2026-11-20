@@ -86,23 +86,42 @@ function isMajorWord(word: string, wordIndex: number): boolean {
 }
 
 function playSuccessTone(kind: "key" | "complete") {
-  if (typeof window === "undefined") return;
-  if (window.localStorage.getItem("scripttype.sound-enabled") === "off") return;
-  if (!window.AudioContext) return;
+    if (typeof window === "undefined") return;
+    if (window.localStorage.getItem("scripttype.sound-enabled") === "off") return;
+    if (!window.AudioContext) return;
 
-  const context = new window.AudioContext();
-  const oscillator = context.createOscillator();
-  const gain = context.createGain();
-  oscillator.type = "sine";
-  oscillator.frequency.value = kind === "complete" ? 660 : 440;
-  gain.gain.setValueAtTime(0.025, context.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.08);
-  oscillator.connect(gain);
-  gain.connect(context.destination);
-  oscillator.start();
-  oscillator.stop(context.currentTime + 0.08);
-  oscillator.onended = () => void context.close();
-}
+    const context = new window.AudioContext();
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    oscillator.type = "sine";
+    oscillator.frequency.value = kind === "complete" ? 660 : 440;
+    gain.gain.setValueAtTime(0.025, context.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.08);
+    oscillator.connect(gain);
+    gain.connect(context.destination);
+    oscillator.start();
+    oscillator.stop(context.currentTime + 0.08);
+    oscillator.onended = () => void context.close();
+  }
+
+  function playWrongTone() {
+    if (typeof window === "undefined") return;
+    if (window.localStorage.getItem("scripttype.sound-enabled") === "off") return;
+    if (!window.AudioContext) return;
+
+    const context = new window.AudioContext();
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    oscillator.type = "sawtooth";
+    oscillator.frequency.value = 180;
+    gain.gain.setValueAtTime(0.015, context.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.1);
+    oscillator.connect(gain);
+    gain.connect(context.destination);
+    oscillator.start();
+    oscillator.stop(context.currentTime + 0.1);
+    oscillator.onended = () => void context.close();
+  }
 
 function getVisibleVerse(verse: Verse, level: number): string {
   if (level === 1) return verse.text;
@@ -302,14 +321,15 @@ export function ChallengeRunner({
     }
 
     if (nextValue.length > typed.length) {
-      for (let index = typed.length; index < nextValue.length; index += 1) {
-        if (nextValue[index] !== verse.text[index]) {
-          setMistakeEvents((count) => count + 1);
-        } else {
-          playSuccessTone("key");
+        for (let index = typed.length; index < nextValue.length; index += 1) {
+          if (nextValue[index] !== verse.text[index]) {
+            setMistakeEvents((count) => count + 1);
+            playWrongTone();
+          } else {
+            playSuccessTone("key");
+          }
         }
       }
-    }
     setTyped(nextValue);
     setErrorMessage("");
   }

@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   AudioLines,
   ChartNoAxesColumnIncreasing,
   Compass,
+  Ellipsis,
   Flame,
   Heart,
   House,
@@ -21,24 +22,32 @@ import { BrandMark } from "@/components/brand-mark";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { PwaInstallButton } from "@/components/pwa-install-button";
 import { Onboarding } from "@/components/onboarding";
+import { ScriptureAssistant } from "@/components/scripture-assistant";
 
 const navigation = [
-  { href: "/today", label: "Today", icon: House, mobile: true },
-  { href: "/journeys", label: "Journeys", icon: Compass, mobile: true },
-  { href: "/practice", label: "Practice", icon: Keyboard, mobile: true },
+  { href: "/today", label: "Today", icon: House, mobilePrimary: true },
+  { href: "/journeys", label: "Journeys", icon: Compass, mobilePrimary: true },
+  { href: "/practice", label: "Practice", icon: Keyboard, mobilePrimary: true },
   {
     href: "/progress",
     label: "Growth",
     icon: ChartNoAxesColumnIncreasing,
-    mobile: true,
+    mobilePrimary: true,
   },
-  { href: "/profile", label: "You", icon: UserRound, mobile: true },
-  { href: "/memory", label: "Memory", icon: Heart, mobile: true },
-  { href: "/trainer", label: "Trainer", icon: Keyboard, mobile: true },
-  { href: "/audio", label: "Listen", icon: AudioLines, mobile: true },
-  { href: "/reflection", label: "Reflection", icon: Sparkles, mobile: true },
-  { href: "/community", label: "Community", icon: UsersRound, mobile: true },
+  { href: "/profile", label: "You", icon: UserRound },
+  { href: "/memory", label: "Memory", icon: Heart },
+  { href: "/trainer", label: "Trainer", icon: Keyboard },
+  { href: "/audio", label: "Listen", icon: AudioLines },
+  { href: "/reflection", label: "Reflection", icon: Sparkles },
+  { href: "/community", label: "Community", icon: UsersRound },
 ];
+
+const mobilePrimaryNavigation = navigation.filter(
+  (item) => "mobilePrimary" in item,
+);
+const moreNavigation = navigation.filter(
+  (item) => !("mobilePrimary" in item),
+);
 
 export function ProductShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -57,7 +66,6 @@ export function ProductShell({ children }: { children: React.ReactNode }) {
     return () => clearTimeout(id);
   }, []);
 
-  // Monitor sessionStorage for onboarding after first win and custom completion event
   const isActive = (href: string) =>
     pathname === href || (href !== "/today" && pathname.startsWith(`${href}/`));
 
@@ -198,7 +206,7 @@ export function ProductShell({ children }: { children: React.ReactNode }) {
                 {user
                   ? "Synced account"
                   : firebaseConfigured
-                    ? "Signed-in mode"
+                    ? "Sync available"
                     : "Device-only mode"}
               </span>
               <span
@@ -252,26 +260,105 @@ export function ProductShell({ children }: { children: React.ReactNode }) {
         </div>
       </div>
 
+      <MobileNavigation key={pathname} pathname={pathname} />
+      <ScriptureAssistant />
+    </div>
+  );
+}
+
+function MobileNavigation({ pathname }: { pathname: string }) {
+  const [isMoreOpen, setIsMoreOpen] = useState(false);
+  const moreButtonRef = useRef<HTMLButtonElement>(null);
+  const isActive = (href: string) =>
+    pathname === href || (href !== "/today" && pathname.startsWith(`${href}/`));
+
+  useEffect(() => {
+    if (!isMoreOpen) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsMoreOpen(false);
+        moreButtonRef.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isMoreOpen]);
+
+  return (
+    <>
       <nav
         aria-label="Mobile navigation"
-        className="mobile-navigation fixed inset-x-0 bottom-0 z-40 grid grid-cols-6 px-1 pb-[max(env(safe-area-inset-bottom),0.25rem)] pt-2 lg:hidden"
+        className="mobile-navigation fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 px-1 pb-[max(env(safe-area-inset-bottom),0.25rem)] pt-2 lg:hidden"
       >
-        {navigation
-          .filter((item) => item.mobile)
-          .map(({ href, label, icon: Icon }) => (
+        {mobilePrimaryNavigation.map(({ href, label, icon: Icon }) => (
+          <Link
+            key={href}
+            href={href}
+            aria-current={isActive(href) ? "page" : undefined}
+            onClick={() => setIsMoreOpen(false)}
+            className={`flex min-h-12 flex-col items-center justify-center gap-1 px-1 text-[10px] font-medium sm:text-xs ${
+              isActive(href) ? "text-primary" : "text-muted-foreground"
+            }`}
+          >
+            <Icon size={18} strokeWidth={isActive(href) ? 2.2 : 1.7} aria-hidden="true" />
+            {label}
+          </Link>
+        ))}
+        <button
+          ref={moreButtonRef}
+          type="button"
+          aria-expanded={isMoreOpen}
+          aria-controls="mobile-more-menu"
+          onClick={() => setIsMoreOpen((open) => !open)}
+          className={`flex min-h-12 flex-col items-center justify-center gap-1 px-1 text-[10px] font-medium sm:text-xs ${
+            isMoreOpen ||
+            moreNavigation.some((item) => isActive(item.href)) ||
+            isActive("/settings")
+              ? "text-primary"
+              : "text-muted-foreground"
+          }`}
+        >
+          <Ellipsis size={19} aria-hidden="true" />
+          More
+        </button>
+      </nav>
+      <div
+          id="mobile-more-menu"
+          hidden={!isMoreOpen}
+          className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] right-2 z-50 w-[min(22rem,calc(100vw-1rem))] rounded-panel border bg-card p-3 shadow-float lg:hidden"
+        >
+          <nav aria-label="More destinations" className="grid grid-cols-2 gap-1">
+            {moreNavigation.map(({ href, label, icon: Icon }) => (
+              <Link
+                key={href}
+                href={href}
+                aria-current={isActive(href) ? "page" : undefined}
+                onClick={() => setIsMoreOpen(false)}
+                className={`flex min-h-11 items-center gap-2 rounded-control px-3 text-sm font-medium ${
+                  isActive(href)
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                }`}
+              >
+                <Icon size={16} aria-hidden="true" />
+                {label}
+              </Link>
+            ))}
             <Link
-              key={href}
-              href={href}
-              aria-current={isActive(href) ? "page" : undefined}
-              className={`flex min-h-12 flex-col items-center justify-center gap-1 text-xs font-medium ${
-                isActive(href) ? "text-primary" : "text-muted-foreground"
+              href="/settings"
+              aria-current={isActive("/settings") ? "page" : undefined}
+              onClick={() => setIsMoreOpen(false)}
+              className={`flex min-h-11 items-center gap-2 rounded-control px-3 text-sm font-medium ${
+                isActive("/settings")
+                  ? "bg-primary/10 text-primary"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
             >
-              <Icon size={18} strokeWidth={isActive(href) ? 2.2 : 1.7} aria-hidden="true" />
-              {label}
+              <Settings2 size={16} aria-hidden="true" />
+              Settings
             </Link>
-          ))}
-      </nav>
-    </div>
+          </nav>
+      </div>
+    </>
   );
 }

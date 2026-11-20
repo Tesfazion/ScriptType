@@ -81,6 +81,7 @@ Bible reading, memorization, and typing practice are usually separate activities
 - **REQ-AUDIO-01:** Audio mode plays an authorized verse recording and reports listening/typing accuracy and speed. Audio may be replayed and has accessible text controls.
 - **REQ-REFLECT-01:** Optional reflection prompts invite observation/application without presuming an answer. AI output is labeled, non-authoritative, and can be disabled.
 - **REQ-REFLECT-02:** Journaling is optional, private by default, encrypted in transit, excluded from analytics and model training, and deletable.
+- **REQ-AI-01:** The optional product-shell assistant supports Scripture questions and typing coaching. Before sending, it obtains explicit consent and discloses that the message, up to six recent chat turns, and a section label are sent to Firebase AI. It must not attach reflections, account data, or progress automatically; users can clear the in-memory conversation and consent.
 - **REQ-PLAN-01:** Free access includes basic typing challenges and basic reading plans. Premium may unlock advanced memory, audio, AI reflection, advanced challenges, and expanded analytics.
 - **REQ-PLAN-02:** Entitlements are verified server-side; paywalls disclose price, renewal, cancellation, and data behavior before purchase.
 
@@ -88,8 +89,10 @@ Bible reading, memorization, and typing practice are usually separate activities
 - **REQ-COMMUNITY-01:** Users can join a group only through an invite/approved flow; group membership and progress visibility are explicit.
 - **REQ-COMMUNITY-02:** Leaderboards and weekly/monthly challenges are opt-in, time-bounded, abuse-resistant, and allow hiding display names.
 - **REQ-COMMUNITY-03:** Reporting, blocking, moderation queues, and group-owner controls exist before public/community launch.
-- **REQ-ADMIN-01:** Authorized staff can create, preview, publish, archive, and version reading plans, journeys, daily verses, achievements, and challenges.
-- **REQ-ADMIN-02:** Admin access is role-based and audited; user management exposes only information needed for support/safety.
+- **REQ-ADMIN-01 (planned; not implemented):** Authorized staff can create, preview, publish, archive, and version reading plans, journeys, daily verses, achievements, and challenges.
+- **REQ-ADMIN-02 (planned; not implemented):** Admin access is role-based and audited; user management exposes only information needed for support/safety.
+
+The current repository has no `/admin` route or publishing interface. These requirements describe future product scope, not capabilities available to users or staff today. Community group creation and moderation workflows are likewise not open in this build.
 
 ## Success measures
 

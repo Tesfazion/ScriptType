@@ -32,7 +32,7 @@ export default function ReflectionPage() {
 
   async function generateReflection() {
     if (!aiConsent) {
-      setMessage("Confirm that you want to send this verse context to Firebase AI.");
+      setMessage("Confirm that you want to send this verse context to the AI.");
       return;
     }
 
@@ -50,7 +50,7 @@ export default function ReflectionPage() {
       setMessage(
         error instanceof Error
           ? error.message
-          : "Firebase AI could not create a reflection.",
+          : "The AI could not create a reflection.",
       );
     } finally {
       setAiLoading(false);
@@ -103,7 +103,11 @@ export default function ReflectionPage() {
 
       <div className="flex items-start gap-3 rounded-card border border-primary/20 bg-accent p-4 text-accent-foreground">
         <LockKeyhole size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
-        <p className="text-xs leading-5">Private by default. Reflections are stored only on this device and are never sent to analytics or AI.</p>
+        <p className="text-sm leading-6">
+          Private by default. Your journal text stays on this device and is not
+          sent to analytics or AI unless you explicitly request an AI reflection.
+          That request sends this verse and your reflection text to the AI.
+        </p>
       </div>
 
       <form onSubmit={saveEntry} className="surface-card mt-5 p-card sm:p-7">
@@ -121,7 +125,7 @@ export default function ReflectionPage() {
         <label htmlFor="reflection-response" className="mt-5 block text-xs font-semibold">Your reflection</label>
         <textarea id="reflection-response" value={response} onChange={(event) => setResponse(event.target.value)} rows={7} maxLength={5000} className="mt-2 w-full resize-y rounded-2xl border bg-background px-4 py-4 text-sm leading-6 outline-none focus:border-primary/60 focus:ring-4 focus:ring-primary/10" placeholder="Write for yourself…" />
         <div className="mt-4 rounded-2xl border border-primary/10 bg-primary/5 p-4">
-          <label className="flex items-start gap-3 text-xs leading-5">
+          <label className="flex min-h-11 items-start gap-3 text-sm leading-6">
             <input
               type="checkbox"
               checked={aiConsent}
@@ -129,8 +133,10 @@ export default function ReflectionPage() {
               className="mt-0.5 size-4 accent-primary focus-visible:ring-2 focus-visible:ring-ring"
             />
             <span>
-              Ask Firebase AI for a gentle reflection. This sends the verse and
-              my reflection text for one response; it is not saved to analytics.
+              Ask the AI for a gentle reflection. This sends the verse and my
+              reflection text to the AI for one response; ScriptType does not
+              save it to analytics. If you save the entry, the AI response is
+              stored with it on this device.
             </span>
           </label>
           <button
@@ -140,7 +146,7 @@ export default function ReflectionPage() {
             className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-full bg-primary px-4 text-xs font-semibold text-primary-foreground disabled:cursor-not-allowed disabled:opacity-45"
           >
             <Sparkles size={14} aria-hidden="true" />
-            {aiLoading ? "Reflecting…" : "Generate with Firebase AI"}
+            {aiLoading ? "Reflecting…" : "Generate with the AI"}
           </button>
           {aiReflection && (
             <div className="mt-4 rounded-xl border bg-card p-4">
@@ -177,7 +183,7 @@ export default function ReflectionPage() {
                 {entry.aiReflection && (
                   <div className="mt-4 rounded-xl border border-primary/10 bg-primary/5 p-3">
                     <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-primary">
-                      Firebase AI reflection
+                      AI reflection
                     </p>
                     <p className="mt-2 whitespace-pre-wrap text-xs leading-5">
                       {entry.aiReflection}

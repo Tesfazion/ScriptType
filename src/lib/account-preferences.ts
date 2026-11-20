@@ -1,6 +1,11 @@
 import { doc, runTransaction } from "firebase/firestore";
 import { firebaseAuth, firestore } from "@/lib/firebase";
-import { readLocalProgress, setLocalWeeklyGoal } from "@/lib/local-progress";
+import {
+  MAX_WEEKLY_GOAL,
+  normalizeWeeklyGoal,
+  readLocalProgress,
+  setLocalWeeklyGoal,
+} from "@/lib/local-progress";
 import { resolvePreference } from "../../shared/account-preferences";
 
 type PreferenceField = "weeklyGoal" | "soundEnabled";
@@ -87,7 +92,7 @@ export async function saveAccountPreference(
       (typeof value !== "number" ||
         !Number.isInteger(value) ||
         value < 1 ||
-        value > 14)) ||
+        value > MAX_WEEKLY_GOAL)) ||
     (field === "soundEnabled" && typeof value !== "boolean")
   ) {
     throw new Error("The account setting is invalid.");
@@ -121,7 +126,10 @@ export async function syncAccountPreferences(): Promise<void> {
     const pendingWeeklyGoal =
       typeof pending.weeklyGoal === "number" &&
       typeof pending.weeklyGoalUpdatedAt === "string"
-        ? { value: pending.weeklyGoal, updatedAt: pending.weeklyGoalUpdatedAt }
+        ? {
+            value: normalizeWeeklyGoal(pending.weeklyGoal),
+            updatedAt: pending.weeklyGoalUpdatedAt,
+          }
         : undefined;
     const remoteWeeklyGoal =
       typeof remotePreferences.weeklyGoal === "number" &&
@@ -129,7 +137,7 @@ export async function syncAccountPreferences(): Promise<void> {
       remotePreferences.weeklyGoal >= 1 &&
       remotePreferences.weeklyGoal <= 14
         ? {
-            value: remotePreferences.weeklyGoal,
+            value: normalizeWeeklyGoal(remotePreferences.weeklyGoal),
             updatedAt:
               typeof remotePreferences.weeklyGoalUpdatedAt === "string"
                 ? remotePreferences.weeklyGoalUpdatedAt

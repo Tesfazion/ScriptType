@@ -219,7 +219,7 @@ export default function ProgressPage() {
               });
             })()}
           </div>
-          <p className="mt-5 text-[10px] leading-5 text-muted-foreground">
+          <p className="mt-5 text-xs leading-5 text-muted-foreground">
             Your weekly goal is {progress?.weeklyGoal ?? 5} practice days. Progress is personal—there&apos;s no penalty for taking a day off.
           </p>
         </section>

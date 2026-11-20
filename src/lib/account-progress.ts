@@ -9,7 +9,10 @@ import {
   Timestamp,
 } from "firebase/firestore";
 import { firestore } from "@/lib/firebase";
-import type { PracticeSession } from "@/lib/local-progress";
+import {
+  normalizeWeeklyGoal,
+  type PracticeSession,
+} from "@/lib/local-progress";
 import type { ProgressView } from "@/lib/progress-types";
 import { normalizeCompletedStageIds } from "../../shared/typing-curriculum";
 
@@ -98,6 +101,7 @@ export function readCachedAccountProgress(uid: string): ProgressView | null {
   }
   return {
     ...parsed,
+    weeklyGoal: normalizeWeeklyGoal(parsed.weeklyGoal),
     achievementIds: parsed.achievementIds ?? [],
   };
 }
@@ -217,7 +221,9 @@ export async function readAccountProgress(uid: string): Promise<ProgressView> {
   return cacheAccountProgress(uid, {
     xp: numberField(data.xp, "XP"),
     activeStreak: numberField(data.activeStreak, "active streak"),
-    weeklyGoal: numberField(data.weeklyGoal, "weekly goal", 5),
+    weeklyGoal: normalizeWeeklyGoal(
+      numberField(data.weeklyGoal, "weekly goal", 5),
+    ),
     weeklySessions,
     qualifiedDates,
     versesCompleted: numberField(data.versesCompleted, "completed verses", completedVerseIds.length),

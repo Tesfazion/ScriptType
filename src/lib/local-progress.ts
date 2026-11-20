@@ -47,6 +47,19 @@ export type LocalProgress = {
 
 const STORAGE_KEY = "scripttype.device-progress.v1";
 const DEFAULT_WEEKLY_GOAL = 5;
+const LEGACY_MAX_WEEKLY_GOAL = 14;
+export const MAX_WEEKLY_GOAL = 7;
+
+export function normalizeWeeklyGoal(goal: number): number {
+  if (
+    !Number.isInteger(goal) ||
+    goal < 1 ||
+    goal > LEGACY_MAX_WEEKLY_GOAL
+  ) {
+    throw new Error("Saved weekly goal must be between 1 and 14 practice days.");
+  }
+  return Math.min(goal, MAX_WEEKLY_GOAL);
+}
 
 function currentTimeZone(): string {
   return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
@@ -69,6 +82,9 @@ function isLocalProgress(value: unknown): value is LocalProgress {
     Array.isArray(progress.completedVerseIds) &&
     Array.isArray(progress.qualifiedDates) &&
     typeof progress.weeklyGoal === "number" &&
+    Number.isInteger(progress.weeklyGoal) &&
+    progress.weeklyGoal >= 1 &&
+    progress.weeklyGoal <= LEGACY_MAX_WEEKLY_GOAL &&
     typeof progress.weekStart === "string" &&
     typeof progress.updatedAt === "string"
   );
@@ -116,6 +132,7 @@ export function readLocalProgress(): LocalProgress {
 
   return {
     ...parsed,
+    weeklyGoal: normalizeWeeklyGoal(parsed.weeklyGoal),
     completedKeyboardStageIds: normalizeCompletedStageIds(
       Array.isArray(parsed.completedKeyboardStageIds)
         ? parsed.completedKeyboardStageIds
@@ -237,8 +254,8 @@ export function recordLocalSession({
 }
 
 export function setLocalWeeklyGoal(goal: number): void {
-  if (!Number.isInteger(goal) || goal < 1 || goal > 14) {
-    throw new Error("Weekly goal must be between 1 and 14 practice days.");
+  if (!Number.isInteger(goal) || goal < 1 || goal > MAX_WEEKLY_GOAL) {
+    throw new Error("Weekly goal must be between 1 and 7 practice days.");
   }
   const progress = readLocalProgress();
   saveLocalProgress({

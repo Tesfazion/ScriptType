@@ -28,8 +28,16 @@ export default function SignInPage() {
   const [resetSent, setResetSent] = useState(false);
 
   function goGuest() {
-    localStorage.setItem("scripttype-device-mode", "1");
-    router.push("/today");
+    try {
+      localStorage.setItem("scripttype-device-mode", "1");
+      router.push("/today");
+    } catch (error) {
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Device-only mode could not be started. Check this browser's storage settings.",
+      );
+    }
   }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -75,6 +83,32 @@ export default function SignInPage() {
     } finally {
       setSubmitting(false);
     }
+  }
+
+  if (!firebaseConfigured && !user) {
+    return (
+      <main className="flex min-h-dvh items-center justify-center bg-background px-5 py-10">
+        <section className="surface-card w-full max-w-[420px] p-6 text-center sm:p-8">
+          <BrandMark size="lg" className="mx-auto" />
+          <p className="eyebrow mt-6 text-primary">Device-only mode</p>
+          <h1 className="page-title mt-2">Keep practicing.</h1>
+          <p className="mt-3 text-sm leading-6 text-muted-foreground">
+            Account sign-in is not configured here. Your progress will stay in this browser.
+          </p>
+          {message && <p role="alert" className="mt-4 text-sm text-destructive">{message}</p>}
+          <button
+            type="button"
+            onClick={goGuest}
+            className="button-primary mt-6 min-h-11 w-full text-sm font-semibold"
+          >
+            Continue on this device
+          </button>
+          <Link href="/" className="mt-5 inline-flex min-h-10 items-center text-sm font-medium text-primary underline underline-offset-4">
+            Back to ScriptType
+          </Link>
+        </section>
+      </main>
+    );
   }
 
   return (
@@ -152,7 +186,6 @@ export default function SignInPage() {
                 type="button"
                 onClick={goGuest}
                 className="button-primary mt-6 w-full min-h-11 text-sm font-semibold"
-                disabled={!firebaseConfigured && !user}
               >
                 Continue without an account
               </button>

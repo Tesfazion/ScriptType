@@ -24,10 +24,10 @@ Use semantic Tailwind utilities such as `bg-background`, `text-muted-foreground`
 ## Type and layout
 
 - Interface: Inter when installed, with system UI fallbacks; Scripture uses a system serif stack and typing uses a system monospace stack. Avoid font downloads that block or make builds network-dependent.
-- Display and page-title sizes are defined in the Tailwind theme; use the shared `page-title`, `eyebrow`, and `reading-type` classes for repeated roles.
-- Spacing tokens: `--space-page`, `--space-section`, and `--space-card`, exposed as `page`, `section`, and `card` spacing utilities.
-- Radius and elevation tokens: `--radius-control-token`, `--radius-card-token`, `--radius-panel-token`, and the `--shadow-*-token` family. Use the shared `surface-card`, `surface-muted`, and button classes before adding one-off treatments.
-- Mobile baseline: 16px page gutters; tablet 24px; wide layouts use max-width reading and practice canvases rather than stretching text.
+- Typography scale: display `clamp(48px, 7vw, 88px)`; page title `clamp(32px, 4vw, 44px)`; body 16px/1.65; supporting text 14px/1.5; caption 12px/1.5. Keep essential labels and instructions at 12px or larger, and prefer 14px for information users must act on. Avoid the 9–10px labels present in some legacy screens.
+- Spacing scale: 4px base increments; page gutters 16px mobile, 28px tablet, and 40px wide; section spacing 32px; card padding 24px. Use `--space-page`, `--space-section`, and `--space-card` rather than one-off page rhythm.
+- Radius: controls 12px, cards 20px, large panels 28px. Elevation: card `0 1px 3px rgb(15 23 42 / 5%), 0 8px 24px rgb(15 23 42 / 4%)`; panel `0 12px 32px rgb(15 23 42 / 8%)`; floating surfaces `0 20px 56px rgb(15 23 42 / 12%)`.
+- Mobile baseline: 16px page gutters and 44px minimum interactive targets; tablet 28px; wide layouts use max-width reading and practice canvases rather than stretching text.
 - Scripture text: 1.4-1.6 line height; comfortable measure; clear reference/translation metadata.
 - Touch targets: at least 44×44 CSS px. Keep challenge input and bottom navigation inside mobile thumb reach.
 
@@ -42,9 +42,11 @@ Use semantic Tailwind utilities such as `bg-background`, `text-muted-foreground`
 - **Learning dashboard:** compact level/XP/WPM/accuracy/streak summary, continue-lesson action, daily goals, recent achievements, weekly activity, and typing analytics.
 - **Race track:** clear relative-progress lanes for the learner and daily race comparators; server-checked score details remain distinct from client-measured elapsed time.
 - **Achievement reveal:** small, celebratory earned-state transition; the content remains visible with motion disabled.
-- **Buttons:** use `button-primary`, `button-secondary`, `button-quiet`, or `button-mission`; visible focus, disabled, busy, and error states.
+- **Buttons:** use `button-primary` for the one primary page action, `button-secondary` for a peer action, `button-quiet` for low-emphasis navigation, and `button-mission` on dark mission surfaces. All controls keep visible focus, disabled, busy, and error states and meet the 44px touch-target baseline.
+- **Cards:** use `surface-card` for content groups, `surface-muted` for supporting information, and a single elevated mission/primary-action surface per page. Do not turn every metric into an equal-weight card; give the next action and meaningful progress the strongest hierarchy.
 - **Forms:** persistent labels, actionable inline validation, autocomplete hints, and accessible error summaries.
-- **Navigation:** mobile bottom bar for Today/Journeys/Progress/Community/Profile; desktop rail with active journey marker.
+- **Navigation:** mobile bottom bar prioritizes Today/Journeys/Practice/Growth; the accessible More panel holds Profile, Memory, Trainer, Listen, Reflection, Community, and Settings. Desktop uses a full navigation rail with a clear active route.
+- **AI assistant:** the product shell exposes an opt-in Scripture and typing assistant. Before sending, explain that the question, up to six recent turns, and a section label go to Firebase AI. Do not attach journal entries, account data, or progress automatically; clearing the chat also clears local consent for that panel.
 
 ## Voice and copy
 
@@ -63,6 +65,7 @@ Use semantic Tailwind utilities such as `bg-background`, `text-muted-foreground`
 ## Accessibility quality bar
 
 - WCAG 2.2 AA target for the complete public/core flow.
+- Body copy is at least 16px by default; secondary copy is at least 14px where practical. Validate actual foreground/background pairs, including muted text and dark mission surfaces, instead of assuming semantic tokens guarantee contrast.
 - Semantic landmarks, heading hierarchy, skip link, focus ring, screen-reader labels, and status announcements.
 - Keyboard-only flow for auth, challenge controls, dialogs, journey map, charts, and community moderation.
 - Charts include text/table summaries; metric changes are not color-only.

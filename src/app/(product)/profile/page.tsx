@@ -9,38 +9,46 @@ import { useProgress } from "@/hooks/use-progress";
 import { firebaseAuth } from "@/lib/firebase";
 import { getTypingLevelProgress } from "../../../../shared/typing-progress";
 
+type FeedbackType = "error" | "status";
+
 export default function ProfilePage() {
   const { user } = useAuth();
   const { progress, loading, errorMessage } = useProgress();
   const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState<FeedbackType>("status");
   const level = getTypingLevelProgress(progress?.xp ?? 0);
   const displayName = user?.displayName || user?.email?.split("@")[0] || "Guest learner";
   const [editingName, setEditingName] = useState(false);
   const [nameDraft, setNameDraft] = useState("");
   const [savingName, setSavingName] = useState(false);
 
+  function showMessage(nextMessage: string, type: FeedbackType) {
+    setMessage(nextMessage);
+    setMessageType(type);
+  }
+
   async function handleSignOut() {
     if (!firebaseAuth) {
-      setMessage("Sign-out is unavailable because Firebase is not configured.");
+      showMessage("Sign-out is unavailable because Firebase is not configured.", "error");
       return;
     }
 
     try {
       await signOut(firebaseAuth);
     } catch {
-      setMessage("We couldn’t sign you out. Please try again.");
+      showMessage("We couldn’t sign you out. Please try again.", "error");
     }
   }
 
   async function handleSaveName(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!firebaseAuth?.currentUser || !user) {
-      setMessage("Sign in to update your display name.");
+      showMessage("Sign in to update your display name.", "error");
       return;
     }
     const nextName = nameDraft.trim();
     if (nextName.length < 2) {
-      setMessage("Display name must be at least 2 characters.");
+      showMessage("Display name must be at least 2 characters.", "error");
       return;
     }
     setSavingName(true);
@@ -48,9 +56,9 @@ export default function ProfilePage() {
     try {
       await updateFirebaseProfile(firebaseAuth.currentUser, { displayName: nextName });
       setEditingName(false);
-      setMessage("Display name updated.");
+      showMessage("Display name updated.", "status");
     } catch {
-      setMessage("We couldn’t update your display name. Please try again.");
+      showMessage("We couldn’t update your display name. Please try again.", "error");
     } finally {
       setSavingName(false);
     }
@@ -78,9 +86,21 @@ export default function ProfilePage() {
         </Link>
       </header>
 
-      {(errorMessage || message) && (
+      {errorMessage && (
         <p role="alert" className="mb-5 rounded-control border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive">
-          {errorMessage || message}
+          {errorMessage}
+        </p>
+      )}
+      {message && (
+        <p
+          role={messageType === "error" ? "alert" : "status"}
+          className={`mb-5 rounded-control border px-4 py-3 text-sm ${
+            messageType === "error"
+              ? "border-destructive/20 bg-destructive/5 text-destructive"
+              : "border-growth/20 bg-growth/5 text-growth"
+          }`}
+        >
+          {message}
         </p>
       )}
 
